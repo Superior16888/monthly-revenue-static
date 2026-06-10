@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.paulhsu.monthly-revenue-update</string>
+    <key>ProgramArguments</key>
+    <array>
+        <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue/venv/bin/python</string>
+        <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue/generate_static.py</string>
+    </array>
+    <key>WorkingDirectory</key>
+    <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue</string>
+    <key>StartCalendarInterval</key>
+    <array>
+        <dict><key>Day</key><integer>11</integer><key>Hour</key><integer>10</integer><key>Minute</key><integer>40</integer></dict>
+        <dict><key>Day</key><integer>12</integer><key>Hour</key><integer>10</integer><key>Minute</key><integer>40</integer></dict>
+        <dict><key>Day</key><integer>13</integer><key>Hour</key><integer>10</integer><key>Minute</key><integer>40</integer></dict>
+    </array>
+    <key>StandardOutPath</key>
+    <string>/tmp/monthly_revenue_update.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/monthly_revenue_update.log</string>
+</dict>
+</plist>

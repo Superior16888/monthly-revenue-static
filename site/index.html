@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>上市公司每月營收</title>
+<script src="plotly.min.js"></script>
+<style>
+  body { font-family: "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
+         margin: 0; background: #fff; color: #222; }
+  header { padding: 14px 20px 8px; }
+  h1 { font-size: 22px; margin: 0 0 10px; }
+  .controls { display: flex; gap: 16px; align-items: center; flex-wrap: wrap; }
+  .controls label { font-size: 15px; }
+  select { font-size: 16px; padding: 4px 8px; margin-left: 4px; }
+  .caption { color: #666; font-size: 13px; margin-top: 8px; }
+  #chart { width: 100%; }
+  #err { color: #b00020; padding: 20px; display: none; }
+</style>
+</head>
+<body>
+<header>
+  <h1>上市公司每月營收</h1>
+  <div class="controls">
+    <label>年度(民國)<select id="year"></select></label>
+    <label>月份<select id="month"></select></label>
+  </div>
+  <div class="caption" id="caption">載入中…</div>
+</header>
+<div id="err"></div>
+<div id="chart"></div>
+<script>
+const $year = document.getElementById('year');
+const $month = document.getElementById('month');
+const $caption = document.getElementById('caption');
+const $err = document.getElementById('err');
+let manifest = null;
+
+const ym = k => k.split('_').map(Number);
+const monthsOf = y => manifest.months.filter(k => ym(k)[0] === y).map(k => ym(k)[1]);
+
+function fillSelect(sel, values, selected) {
+  sel.innerHTML = '';
+  for (const v of values) {
+    const o = document.createElement('option');
+    o.value = v; o.textContent = v;
+    if (v === selected) o.selected = true;
+    sel.appendChild(o);
+  }
+}
+
+async function load(y, m) {
+  $caption.textContent = '載入中…';
+  try {
+    const r = await fetch(`data/${y}_${m}.json`);
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    const p = await r.json();
+    const fig = p.fig;
+    delete fig.layout.width;
+    fig.layout.autosize = true;
+    fig.layout.height = Math.max(480, window.innerHeight - document.querySelector('header').offsetHeight - 20);
+    await Plotly.newPlot('chart', fig.data, fig.layout, {responsive: true, displayModeBar: false});
+    $caption.textContent = `民國 ${y} 年 ${m} 月 · 共 ${p.count} 家公司 · 單位：億元 · 顏色：月營收增減(紅漲綠跌±50%封頂) · 資料來源：公開資訊觀測站`;
+    history.replaceState(null, '', `#${y}_${m}`);
+    $err.style.display = 'none';
+  } catch (e) {
+    $err.textContent = `無法載入 ${y} 年 ${m} 月資料：${e.message}`;
+    $err.style.display = 'block';
+    $caption.textContent = '';
+  }
+}
+
+function current() { return [Number($year.value), Number($month.value)]; }
+
+$year.addEventListener('change', () => {
+  const y = Number($year.value);
+  const months = monthsOf(y);
+  const keep = Number($month.value);
+  const m = months.includes(keep) ? keep : months[months.length - 1];
+  fillSelect($month, months, m);
+  load(y, m);
+});
+$month.addEventListener('change', () => load(...current()));
+
+(async () => {
+  try {
+    const r = await fetch('manifest.json', {cache: 'no-cache'});
+    manifest = await r.json();
+    let [y, m] = ym(manifest.latest);
+    if (location.hash.match(/^#\d+_\d+$/)) {
+      const [hy, hm] = ym(location.hash.slice(1));
+      if (manifest.months.includes(`${hy}_${hm}`)) { y = hy; m = hm; }
+    }
+    const years = [...new Set(manifest.months.map(k => ym(k)[0]))].sort((a, b) => a - b);
+    fillSelect($year, years, y);
+    fillSelect($month, monthsOf(y), m);
+    load(y, m);
+  } catch (e) {
+    $err.textContent = `無法載入月份清單：${e.message}`;
+    $err.style.display = 'block';
+    $caption.textContent = '';
+  }
+})();
+</script>
+</body>
+</html>

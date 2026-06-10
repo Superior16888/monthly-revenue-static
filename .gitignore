@@ -1,0 +1,7 @@
+venv/
+__pycache__/
+.ipynb_checkpoints/
+site/data/
+site/manifest.json
+*.log
+.DS_Store
