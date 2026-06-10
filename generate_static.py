@@ -74,6 +74,10 @@ def build_payload(df):
     limit = 0.5
     f["月營收變動"] = np.where(f["月營收增減"] > limit, limit,
                    np.where(f["月營收增減"] < -limit, -limit, f["月營收增減"]))
+    # hover fields as pre-formatted strings: undefined ratios (上月/去年=0) show — not NaN%
+    f["_增減txt"] = f["月營收增減"].map(fmt_pct)
+    f["_累計增減txt"] = f["累計營收增減"].map(fmt_pct)
+    f["_累計txt"] = f["累計營業收入-當月累計營收"].map(lambda x: f"{x:,.0f}")
 
     fig = px.treemap(f,
                      path=[px.Constant("月營收"), "產業別", "公司名稱"],
@@ -81,12 +85,41 @@ def build_payload(df):
                      color="月營收變動",
                      color_continuous_scale="RdYlBu_r",
                      color_continuous_midpoint=0,
-                     custom_data=["月營收增減", "累計營收增減",
-                                  "累計營業收入-當月累計營收", "累計營業收入-去年累計營收"])
+                     custom_data=["_增減txt", "_累計增減txt", "_累計txt"])
     fig.update_layout(autosize=True, margin=dict(t=30, l=10, r=10, b=5))
-    fig.update_traces(hovertemplate="當月營收(億)：%{value:.0f}<br>營收增減: %{customdata[0]:.1%}<br>當年累計營收: %{customdata[2]:.0f}<br>累計營收增減: %{customdata[1]:.1%}")
+    fill_branch_customdata(fig, f)
+    fig.update_traces(hovertemplate="當月營收(億)：%{value:.0f}<br>營收增減: %{customdata[0]}<br>當年累計營收: %{customdata[2]}<br>累計營收增減: %{customdata[1]}")
     fig.update_traces(textinfo="label+percent entry", textfont_size=16)
     return {"count": int(len(f)), "fig": json.loads(fig.to_json())}
+
+
+def fmt_pct(x):
+    return "—" if pd.isna(x) or np.isinf(x) else f"{x:+.1%}"
+
+
+def fill_branch_customdata(fig, f):
+    # px.treemap aggregates `values` for branch nodes but leaves their
+    # customdata as NaN, so root/industry hovers showed NaN%
+    sums = f.groupby("產業別")[COLS[2:]].sum()
+    sums.loc["__total__"] = sums.sum()
+
+    def agg_row(name):
+        r = sums.loc[name]
+        return [
+            fmt_pct((r["營業收入-當月營收"] - r["營業收入-上月營收"]) / abs(r["營業收入-上月營收"])),
+            fmt_pct((r["累計營業收入-當月累計營收"] - r["累計營業收入-去年累計營收"]) / abs(r["累計營業收入-去年累計營收"])),
+            f'{r["累計營業收入-當月累計營收"]:,.0f}',
+        ]
+
+    tr = fig.data[0]
+    cd = [list(row)[:3] for row in tr.customdata]  # px appends the color col; drop it
+    for i, node_id in enumerate(tr.ids):
+        parts = node_id.split("/")
+        if len(parts) == 1:
+            cd[i] = agg_row("__total__")
+        elif len(parts) == 2 and parts[1] in sums.index:
+            cd[i] = agg_row(parts[1])
+    tr.customdata = cd
 
 
 def rebuild_manifest():
