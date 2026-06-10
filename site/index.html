@@ -24,6 +24,12 @@
   <div class="controls">
     <label>年度(民國)<select id="year"></select></label>
     <label>月份<select id="month"></select></label>
+    <label>顏色指標<select id="metric">
+      <option value="yoy" selected>年增率</option>
+      <option value="acc">年增率加速</option>
+      <option value="mom">月增率</option>
+      <option value="cum">累計年增率</option>
+    </select></label>
   </div>
   <div class="caption" id="caption">載入中…</div>
 </header>
@@ -32,9 +38,41 @@
 <script>
 const $year = document.getElementById('year');
 const $month = document.getElementById('month');
+const $metric = document.getElementById('metric');
 const $caption = document.getElementById('caption');
 const $err = document.getElementById('err');
 let manifest = null;
+let payload = null;
+let captionBase = '';
+
+// tick positions on the signed-power scale: t = (v/cap)^0.55
+const PCT_TICKS = {
+  vals: [-1, -0.604, -0.282, 0, 0.282, 0.604, 1],
+  text: ['≤−50%', '−20%', '−5%', '0', '+5%', '+20%', '≥+50%']
+};
+const ACC_TICKS = {
+  vals: [-1, -0.547, -0.282, 0, 0.282, 0.547, 1],
+  text: ['≤−30pp', '−10pp', '−3pp', '0', '+3pp', '+10pp', '≥+30pp']
+};
+const METRICS = {
+  yoy: { label: '年增率', ticks: PCT_TICKS },
+  acc: { label: '年增率加速', ticks: ACC_TICKS },
+  mom: { label: '月增率', ticks: PCT_TICKS },
+  cum: { label: '累計年增率', ticks: PCT_TICKS }
+};
+
+function applyMetric() {
+  if (!payload) return;
+  const m = METRICS[$metric.value];
+  Plotly.restyle('chart', { 'marker.colors': [payload.colors[$metric.value]] });
+  Plotly.relayout('chart', {
+    'coloraxis.colorbar.title.text': m.label,
+    'coloraxis.colorbar.tickvals': m.ticks.vals,
+    'coloraxis.colorbar.ticktext': m.ticks.text
+  });
+  $caption.textContent = `${captionBase} · 顏色：${m.label}(紅漲綠跌) · 資料來源：公開資訊觀測站`;
+}
+$metric.addEventListener('change', applyMetric);
 
 const ym = k => k.split('_').map(Number);
 const monthsOf = y => manifest.months.filter(k => ym(k)[0] === y).map(k => ym(k)[1]);
@@ -54,13 +92,14 @@ async function load(y, m) {
   try {
     const r = await fetch(`data/${y}_${m}.json`);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
-    const p = await r.json();
-    const fig = p.fig;
+    payload = await r.json();
+    const fig = payload.fig;
     delete fig.layout.width;
     fig.layout.autosize = true;
     fig.layout.height = Math.max(480, window.innerHeight - document.querySelector('header').offsetHeight - 20);
     await Plotly.newPlot('chart', fig.data, fig.layout, {responsive: true, displayModeBar: false});
-    $caption.textContent = `民國 ${y} 年 ${m} 月 · 共 ${p.count} 家公司 · 單位：億元 · 顏色：月營收增減(紅漲綠跌±50%封頂) · 資料來源：公開資訊觀測站`;
+    captionBase = `民國 ${y} 年 ${m} 月 · 共 ${payload.count} 家公司 · 單位：億元`;
+    applyMetric();
     history.replaceState(null, '', `#${y}_${m}`);
     $err.style.display = 'none';
   } catch (e) {
