@@ -220,10 +220,12 @@ def main():
             session = new_session()
         try:
             cur = get_raw(session, y, m)
-            try:
+            if prev_ym(y, m) < START:
+                prev = None  # MOPS has no data before 102_1; first month has no acc
+            else:
+                # prev fetch failure must FAIL the month (retried next pass) —
+                # silently writing acc=null once left 115_3 all-gray in acc view
                 prev = get_raw(session, *prev_ym(y, m))
-            except Exception:
-                prev = None  # acceleration column shows — for this month
             payload = build_payload(cur, prev)
             (DATA / f"{y}_{m}.json").write_text(json.dumps(payload, ensure_ascii=False))
             fetched += 1
