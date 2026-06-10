@@ -125,9 +125,7 @@ def node_metrics(row, prev_yoy):
 
 def build_payload(df, prev_df=None):
     df = df.copy()
-    df["公司名稱"] = df["公司名稱"].astype(str)
-    dup = df.duplicated(["產業別", "公司名稱"], keep=False)
-    df.loc[dup, "公司名稱"] = df.loc[dup, "公司名稱"] + df.loc[dup, "公司代號"].astype(str)
+    df["公司名稱"] = df["公司名稱"].astype(str) + "<br>" + df["公司代號"].astype(str)
     f = df[df["營業收入-當月營收"] > 0][COLS + ["公司代號"]].copy()
     for col in MONEY:
         f[col] = (f[col] / 100000).round(2)  # 千元 → 億元
@@ -148,16 +146,14 @@ def build_payload(df, prev_df=None):
                                      "<br>年增率: %{customdata[1]}"
                                      "<br>年增率加速: %{customdata[2]}"
                                      "<br>當年累計營收: %{customdata[4]}"
-                                     "<br>累計年增率: %{customdata[3]}"
-                                     "<extra>%{customdata[5]}</extra>"))
-    # cells: name + share of WHOLE market only (no ticker codes); code moves to hover
-    fig.update_traces(textinfo="label+percent root", textfont_size=16)
+                                     "<br>累計年增率: %{customdata[3]}"))
+    # cells: name + ticker code only — no percent numbers (area already encodes share)
+    fig.update_traces(textinfo="label", textfont_size=16)
 
     # per-node metrics: leaves from rows, branches from industry/total sums
     # (px only aggregates `values` for branch nodes, not color/customdata)
     leaf = {f"月營收/{r['產業別']}/{r['公司名稱']}":
             node_metrics(r, pv["by_co"].get(str(r["公司代號"])) if pv else None)
-            | {"code": str(r["公司代號"])}
             for _, r in f.iterrows()}
     sums = f.groupby("產業別")[MONEY].sum()
     ind = {name: node_metrics(r, pv["by_ind"].get(name) if pv else None)
@@ -175,8 +171,7 @@ def build_payload(df, prev_df=None):
         for k in CAPS:
             colors[k].append(spow(v[k], CAPS[k]))
         cd.append([fmt_pct(v["mom"]), fmt_pct(v["yoy"]), fmt_pp(v["acc"]),
-                   fmt_pct(v["cum"]), "—" if pd.isna(v["cumrev"]) else f"{v['cumrev']:,.0f}",
-                   v.get("code", "")])
+                   fmt_pct(v["cum"]), "—" if pd.isna(v["cumrev"]) else f"{v['cumrev']:,.0f}"])
     tr.customdata = cd
     tr.marker.colors = colors["yoy"]
     fig.update_layout(coloraxis=dict(cmin=-1, cmax=1, cauto=False,
