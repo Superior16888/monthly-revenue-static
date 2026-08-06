@@ -4,6 +4,12 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>上市公司每月營收</title>
+<link rel="manifest" href="app.webmanifest">
+<meta name="theme-color" content="#1a6fc4">
+<link rel="icon" href="favicon-32.png" sizes="32x32">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="月營收">
 <script src="plotly.min.js"></script>
 <style>
   body { font-family: "PingFang TC", "Microsoft JhengHei", -apple-system, sans-serif;
@@ -145,6 +151,13 @@ $month.addEventListener('change', () => load(...current()));
     $caption.textContent = '';
   }
 })();
+
+// PWA：註冊 service worker（失敗不影響網頁本身，所以只是靜默略過）
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('sw.js').catch(() => {});
+  });
+}
 </script>
 </body>
 </html>
