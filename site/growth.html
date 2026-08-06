@@ -1,0 +1,667 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="台股全市場月營收連續成長掃描 — 已校正農曆春節位移。">
+<title>台股連續成長掃描 · 2026-08-06</title>
+<style>
+:root{
+  --paper:#fff; --ink:#222; --ink-2:#555; --ink-3:#888;
+  --rule:#ddd; --rule-2:#f5f5f5; --panel:#fff;
+  --rise:#c8322d; --fall:#1f7a54; --accent:#1a6fc4;
+  --mono:ui-monospace,"SF Mono",SFMono-Regular,Menlo,Consolas,monospace;
+  --sans:"PingFang TC","Microsoft JhengHei",-apple-system,
+    BlinkMacSystemFont,sans-serif;
+}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--sans);
+  line-height:1.55;-webkit-font-smoothing:antialiased;margin:0;
+  padding:clamp(20px,4vw,56px) clamp(14px,4vw,40px)}
+.wrap{max-width:1180px;margin:0 auto;display:flex;flex-direction:column;gap:34px}
+.lab{font-size:11px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--ink-3);font-family:var(--mono)}
+.sitenav{display:flex;gap:14px;align-items:baseline;font-size:13px;padding-bottom:4px}
+.sitenav a{color:var(--accent);text-decoration:none}
+.sitenav a:hover{text-decoration:underline}
+.sitenav span{color:var(--ink-3)}
+header{display:flex;flex-direction:column;gap:12px;
+  border-bottom:2px solid var(--ink);padding-bottom:16px}
+h1{font-size:clamp(23px,3.4vw,34px);font-weight:650;letter-spacing:-.015em;
+  text-wrap:balance;margin:0;line-height:1.2}
+h1 em{font-style:normal;color:var(--accent)}
+.sub{color:var(--ink-2);font-size:14.5px;max-width:64ch;margin:0}
+.formula{font-family:var(--mono);font-size:12px;color:var(--ink-2);
+  background:var(--rule-2);border-left:3px solid var(--accent);
+  padding:9px 13px;overflow-x:auto;white-space:nowrap}
+.stats{display:grid;grid-template-columns:repeat(auto-fit,minmax(148px,1fr));
+  gap:1px;background:var(--rule);border:1px solid var(--rule)}
+.stat{background:var(--panel);padding:13px 15px;display:flex;
+  flex-direction:column;gap:4px}
+.stat b{font-family:var(--mono);font-size:26px;font-weight:600;
+  font-variant-numeric:tabular-nums;letter-spacing:-.02em;line-height:1}
+.stat span{font-size:11.5px;color:var(--ink-3)}
+.scroll{overflow-x:auto;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink)}
+table{border-collapse:collapse;width:100%;min-width:960px;
+  font-variant-numeric:tabular-nums}
+thead th{font-size:10.5px;letter-spacing:.09em;text-transform:uppercase;
+  color:var(--ink-3);font-weight:500;font-family:var(--mono);text-align:right;
+  padding:9px;border-bottom:1px solid var(--rule);white-space:nowrap;
+  position:sticky;top:0;background:var(--paper)}
+thead th:first-child,thead th.l{text-align:left}
+tbody tr{border-bottom:1px solid var(--rule-2)}
+tbody tr:hover{background:var(--rule-2)}
+td,tbody th{padding:7px 9px;font-size:13px}
+.name{text-align:left;font-weight:400;white-space:nowrap;display:flex;
+  flex-direction:column;gap:1px}
+.code{font-family:var(--mono);font-size:11px;color:var(--ink-3);letter-spacing:.02em}
+.cname{font-size:13.5px;font-weight:500}
+.held{font-weight:500;font-size:10px;font-style:normal;margin-left:6px;
+  padding:1px 5px;border:1px solid var(--rise);color:var(--rise);
+  border-radius:2px;letter-spacing:.04em;vertical-align:1px}
+.n{text-align:right;font-family:var(--mono);font-size:12.5px;white-space:nowrap}
+.dim{color:var(--ink-2)}
+.up{color:var(--rise)}
+.down{color:var(--fall)}
+.ind{color:var(--ink-3);font-size:11.5px;white-space:nowrap}
+.sparkcell{width:140px;padding:5px 9px}
+.spark{display:block;width:132px;height:26px}
+.spark .b.up{fill:var(--rise)}
+.spark .b.down{fill:var(--fall)}
+.spark-zero{stroke:var(--rule);stroke-width:1}
+.streak{text-align:right;white-space:nowrap}
+.sv{font-family:var(--mono);font-size:12.5px;margin-right:7px}
+.meter{display:inline-flex;gap:1px;vertical-align:1px}
+.meter i{width:2px;height:11px;background:var(--rule);display:block}
+.meter i.on{background:var(--accent)}
+.two{display:grid;grid-template-columns:minmax(260px,1fr) minmax(300px,1.3fr);
+  gap:34px;align-items:start}
+@media(max-width:760px){.two{grid-template-columns:1fr}}
+ul.ind-list{list-style:none;padding:0;margin:10px 0 0;display:flex;
+  flex-direction:column;gap:6px}
+ul.ind-list li{display:grid;grid-template-columns:8.5em 1fr 2.2em;
+  align-items:center;gap:10px;font-size:12.5px}
+.il{color:var(--ink-2)}
+.ib{height:9px;background:var(--rule-2);display:block}
+.ib i{display:block;height:100%;background:var(--accent);opacity:.75}
+.ic{font-family:var(--mono);font-size:11.5px;color:var(--ink-3);text-align:right}
+h2{font-size:15px;font-weight:600;margin:0;letter-spacing:-.005em}
+.note{font-size:13px;color:var(--ink-2);max-width:62ch}
+.note p{margin:9px 0}
+.note strong{color:var(--ink);font-weight:600}
+dl.traps{margin:10px 0 0;display:flex;flex-direction:column;gap:11px}
+dl.traps dt{font-size:12.5px;font-weight:600;color:var(--ink)}
+dl.traps dd{margin:2px 0 0;font-size:12.5px;color:var(--ink-2)}
+footer{border-top:1px solid var(--rule);padding-top:14px;font-size:11.5px;
+  color:var(--ink-3);display:flex;flex-wrap:wrap;gap:8px 22px}
+a{color:var(--accent)}
+:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap"><nav class="sitenav"><a href="./">← 每月營收 Treemap</a><span>連續成長掃描</span></nav>
+<header>
+  <div class="lab">台股全市場掃描 · 資料日 2026-08-04 / 2026-08-05</div>
+  <h1>連續成長掃描：<em>36</em> 檔通過</h1>
+  <p class="sub">台灣上市櫃公司每月 10 日前須公告當月營收 —— 全市場、免費、公司自報的領先指標，美股與 A 股都沒有對應制度。此掃描找的是<strong>持續成長</strong>，不是單月反彈。</p>
+  <div class="formula">連續 YoY 正成長 ≥ 12 個月　·　最新 YoY 20–300%　·　月營收 ≥ 3 億　·　成交量 ≥ 1000 張　·　PE 0–30　·　排除交屋認列型產業</div>
+</header>
+
+<div class="stats">
+  <div class="stat"><b>2,389</b><span>全市場掃描檔數</span></div>
+  <div class="stat"><b>1,975</b><span>有月營收的公司</span></div>
+  <div class="stat"><b>36</b><span>通過全部條件</span></div>
+  <div class="stat"><b>24</b><span>最長連續月數</span></div>
+</div>
+
+<section>
+  <h2>結果</h2>
+  <p class="note" style="margin:6px 0 12px">走勢欄是近 24 個月的營收年增率，<span class="up">紅</span>為正、<span class="down">綠</span>為負，共用刻度並在 ±150% 封頂 —— 看的是形狀：整排紅柱是持續成長，單根突出的是一次性事件。</p>
+  <div class="scroll"><table>
+    <thead><tr><th class="l">公司</th><th class="l">近 24 月 YoY 走勢</th>
+      <th>連續</th><th>最新 YoY</th><th>12月均</th><th>加速 pp</th>
+      <th>月營收 億</th><th>PE</th><th>近 3 月</th><th>距高</th>
+      <th class="l">產業</th></tr></thead>
+    <tbody>
+<tr>
+<th scope="row" class="name"><span class="code">2317</span>
+<span class="cname">鴻海</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.24" width="3.52" height="1.76"/><rect class="b up" x="6.49" y="10.38" width="3.52" height="2.62"/><rect class="b up" x="11.99" y="12.13" width="3.52" height="0.87"/><rect class="b up" x="17.49" y="12.31" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.72" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="9.62" width="3.52" height="3.38"/><rect class="b up" x="33.99" y="12.74" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="8.49" width="3.52" height="4.51"/><rect class="b up" x="44.99" y="11.13" width="3.52" height="1.87"/><rect class="b up" x="50.49" y="10.96" width="3.52" height="2.04"/><rect class="b up" x="55.99" y="12.05" width="3.52" height="0.95"/><rect class="b up" x="61.49" y="12.19" width="3.52" height="0.81"/><rect class="b up" x="66.99" y="12.42" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.15" width="3.52" height="0.85"/><rect class="b up" x="77.99" y="11.86" width="3.52" height="1.14"/><rect class="b up" x="83.49" y="12.10" width="3.52" height="0.90"/><rect class="b up" x="88.99" y="10.96" width="3.52" height="2.04"/><rect class="b up" x="94.49" y="10.46" width="3.52" height="2.54"/><rect class="b up" x="99.99" y="10.16" width="3.52" height="2.84"/><rect class="b up" x="105.49" y="12.35" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="9.35" width="3.52" height="3.65"/><rect class="b up" x="116.49" y="10.62" width="3.52" height="2.38"/><rect class="b up" x="121.99" y="9.83" width="3.52" height="3.17"/><rect class="b up" x="127.49" y="8.83" width="3.52" height="4.17"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">52.1</td>
+<td class="n dim">25.9</td>
+<td class="n up">+12.5</td>
+<td class="n">8,218</td>
+<td class="n dim">17.8</td>
+<td class="n up">+8.7</td>
+<td class="n dim">-12.0</td>
+<td class="ind">其他電子業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2357</span>
+<span class="cname">華碩</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.92" width="3.52" height="2.08"/><rect class="b up" x="6.49" y="11.60" width="3.52" height="1.40"/><rect class="b up" x="11.99" y="10.84" width="3.52" height="2.16"/><rect class="b up" x="17.49" y="11.52" width="3.52" height="1.48"/><rect class="b up" x="22.99" y="10.72" width="3.52" height="2.28"/><rect class="b up" x="28.49" y="10.13" width="3.52" height="2.87"/><rect class="b up" x="33.99" y="12.77" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="10.66" width="3.52" height="2.34"/><rect class="b up" x="44.99" y="10.66" width="3.52" height="2.34"/><rect class="b up" x="50.49" y="10.19" width="3.52" height="2.81"/><rect class="b up" x="55.99" y="9.72" width="3.52" height="3.28"/><rect class="b up" x="61.49" y="11.62" width="3.52" height="1.38"/><rect class="b up" x="66.99" y="11.73" width="3.52" height="1.27"/><rect class="b up" x="72.49" y="12.21" width="3.52" height="0.79"/><rect class="b up" x="77.99" y="10.36" width="3.52" height="2.64"/><rect class="b up" x="83.49" y="10.38" width="3.52" height="2.62"/><rect class="b up" x="88.99" y="11.35" width="3.52" height="1.65"/><rect class="b up" x="94.49" y="9.51" width="3.52" height="3.49"/><rect class="b up" x="99.99" y="6.60" width="3.52" height="6.40"/><rect class="b up" x="105.49" y="11.47" width="3.52" height="1.53"/><rect class="b up" x="110.99" y="10.30" width="3.52" height="2.70"/><rect class="b up" x="116.49" y="9.34" width="3.52" height="3.66"/><rect class="b up" x="121.99" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="127.49" y="8.55" width="3.52" height="4.45"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">55.6</td>
+<td class="n dim">33.3</td>
+<td class="n up">+46.3</td>
+<td class="n">1,067</td>
+<td class="n dim">14.4</td>
+<td class="n up">+33.6</td>
+<td class="n dim">-6.8</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2382</span>
+<span class="cname">廣達</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="9.56" width="3.52" height="3.44"/><rect class="b up" x="6.49" y="9.54" width="3.52" height="3.46"/><rect class="b up" x="11.99" y="8.37" width="3.52" height="4.63"/><rect class="b up" x="17.49" y="9.10" width="3.52" height="3.90"/><rect class="b up" x="22.99" y="10.09" width="3.52" height="2.91"/><rect class="b up" x="28.49" y="9.08" width="3.52" height="3.92"/><rect class="b up" x="33.99" y="5.36" width="3.52" height="7.64"/><rect class="b up" x="39.49" y="6.71" width="3.52" height="6.29"/><rect class="b up" x="44.99" y="5.86" width="3.52" height="7.14"/><rect class="b up" x="50.49" y="8.34" width="3.52" height="4.66"/><rect class="b up" x="55.99" y="8.34" width="3.52" height="4.66"/><rect class="b up" x="61.49" y="7.35" width="3.52" height="5.65"/><rect class="b up" x="66.99" y="10.81" width="3.52" height="2.19"/><rect class="b up" x="72.49" y="12.58" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="11.50" width="3.52" height="1.50"/><rect class="b up" x="83.49" y="10.81" width="3.52" height="2.19"/><rect class="b up" x="88.99" y="10.08" width="3.52" height="2.92"/><rect class="b up" x="94.49" y="5.44" width="3.52" height="7.56"/><rect class="b up" x="99.99" y="8.05" width="3.52" height="4.95"/><rect class="b up" x="105.49" y="9.54" width="3.52" height="3.46"/><rect class="b up" x="110.99" y="5.93" width="3.52" height="7.07"/><rect class="b up" x="116.49" y="3.34" width="3.52" height="9.66"/><rect class="b up" x="121.99" y="5.45" width="3.52" height="7.55"/><rect class="b up" x="127.49" y="4.77" width="3.52" height="8.23"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">102.9</td>
+<td class="n dim">60.1</td>
+<td class="n up">+8.5</td>
+<td class="n">3,852</td>
+<td class="n dim">15.1</td>
+<td class="n down">-7.1</td>
+<td class="n dim">-24.1</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2402</span>
+<span class="cname">毅嘉</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.06" width="3.52" height="0.94"/><rect class="b up" x="6.49" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="11.99" y="12.29" width="3.52" height="0.71"/><rect class="b up" x="17.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="22.99" y="11.89" width="3.52" height="1.11"/><rect class="b up" x="28.49" y="11.85" width="3.52" height="1.15"/><rect class="b up" x="33.99" y="11.69" width="3.52" height="1.31"/><rect class="b up" x="39.49" y="11.53" width="3.52" height="1.47"/><rect class="b up" x="44.99" y="10.54" width="3.52" height="2.46"/><rect class="b up" x="50.49" y="11.10" width="3.52" height="1.90"/><rect class="b up" x="55.99" y="11.35" width="3.52" height="1.65"/><rect class="b up" x="61.49" y="12.27" width="3.52" height="0.73"/><rect class="b up" x="66.99" y="12.33" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.43" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="11.92" width="3.52" height="1.08"/><rect class="b up" x="83.49" y="12.30" width="3.52" height="0.70"/><rect class="b up" x="88.99" y="12.87" width="3.52" height="0.70"/><rect class="b up" x="94.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="99.99" y="11.19" width="3.52" height="1.81"/><rect class="b up" x="105.49" y="12.15" width="3.52" height="0.85"/><rect class="b up" x="110.99" y="11.92" width="3.52" height="1.08"/><rect class="b up" x="116.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="121.99" y="11.91" width="3.52" height="1.09"/><rect class="b up" x="127.49" y="11.26" width="3.52" height="1.74"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">21.7</td>
+<td class="n dim">12.6</td>
+<td class="n up">+8.1</td>
+<td class="n">11</td>
+<td class="n dim">27.6</td>
+<td class="n down">-17.9</td>
+<td class="n dim">-28.1</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2441</span>
+<span class="cname">超豐</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.10" width="3.52" height="0.90"/><rect class="b up" x="6.49" y="12.25" width="3.52" height="0.75"/><rect class="b up" x="11.99" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="17.49" y="12.30" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.52" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="11.72" width="3.52" height="1.28"/><rect class="b up" x="33.99" y="12.66" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="11.75" width="3.52" height="1.25"/><rect class="b up" x="44.99" y="11.71" width="3.52" height="1.29"/><rect class="b up" x="50.49" y="12.37" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="12.43" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="12.17" width="3.52" height="0.83"/><rect class="b up" x="66.99" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="72.49" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="77.99" y="12.05" width="3.52" height="0.95"/><rect class="b up" x="83.49" y="11.65" width="3.52" height="1.35"/><rect class="b up" x="88.99" y="12.10" width="3.52" height="0.90"/><rect class="b up" x="94.49" y="12.70" width="3.52" height="0.70"/><rect class="b up" x="99.99" y="10.46" width="3.52" height="2.54"/><rect class="b up" x="105.49" y="11.48" width="3.52" height="1.52"/><rect class="b up" x="110.99" y="11.86" width="3.52" height="1.14"/><rect class="b up" x="116.49" y="11.94" width="3.52" height="1.06"/><rect class="b up" x="121.99" y="11.33" width="3.52" height="1.67"/><rect class="b up" x="127.49" y="10.34" width="3.52" height="2.66"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">33.2</td>
+<td class="n dim">16.2</td>
+<td class="n up">+12.3</td>
+<td class="n">19</td>
+<td class="n dim">22.1</td>
+<td class="n up">+32.6</td>
+<td class="n dim">-17.2</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3044</span>
+<span class="cname">健鼎</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.91" width="3.52" height="1.09"/><rect class="b up" x="6.49" y="12.38" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="12.57" width="3.52" height="0.70"/><rect class="b up" x="17.49" y="12.11" width="3.52" height="0.89"/><rect class="b up" x="22.99" y="12.06" width="3.52" height="0.94"/><rect class="b up" x="28.49" y="11.43" width="3.52" height="1.57"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="10.39" width="3.52" height="2.61"/><rect class="b up" x="44.99" y="11.77" width="3.52" height="1.23"/><rect class="b up" x="50.49" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="55.99" y="11.74" width="3.52" height="1.26"/><rect class="b up" x="61.49" y="12.42" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.46" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.68" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="11.53" width="3.52" height="1.47"/><rect class="b up" x="83.49" y="12.09" width="3.52" height="0.91"/><rect class="b up" x="88.99" y="12.18" width="3.52" height="0.82"/><rect class="b up" x="94.49" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="99.99" y="10.52" width="3.52" height="2.48"/><rect class="b up" x="105.49" y="12.14" width="3.52" height="0.86"/><rect class="b up" x="110.99" y="11.05" width="3.52" height="1.95"/><rect class="b up" x="116.49" y="10.69" width="3.52" height="2.31"/><rect class="b up" x="121.99" y="9.27" width="3.52" height="3.73"/><rect class="b up" x="127.49" y="9.64" width="3.52" height="3.36"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">42.0</td>
+<td class="n dim">20.6</td>
+<td class="n down">-4.6</td>
+<td class="n">80</td>
+<td class="n dim">19.1</td>
+<td class="n down">-14.8</td>
+<td class="n dim">-28.4</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3090</span>
+<span class="cname">日電貿</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.42" width="3.52" height="1.58"/><rect class="b up" x="6.49" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="11.99" y="12.08" width="3.52" height="0.92"/><rect class="b up" x="17.49" y="10.98" width="3.52" height="2.02"/><rect class="b up" x="22.99" y="12.13" width="3.52" height="0.87"/><rect class="b up" x="28.49" y="11.31" width="3.52" height="1.69"/><rect class="b up" x="33.99" y="11.60" width="3.52" height="1.40"/><rect class="b up" x="39.49" y="7.43" width="3.52" height="5.57"/><rect class="b up" x="44.99" y="10.99" width="3.52" height="2.01"/><rect class="b up" x="50.49" y="8.87" width="3.52" height="4.13"/><rect class="b up" x="55.99" y="10.14" width="3.52" height="2.86"/><rect class="b up" x="61.49" y="9.58" width="3.52" height="3.42"/><rect class="b up" x="66.99" y="11.90" width="3.52" height="1.10"/><rect class="b up" x="72.49" y="11.18" width="3.52" height="1.82"/><rect class="b up" x="77.99" y="10.38" width="3.52" height="2.62"/><rect class="b up" x="83.49" y="11.50" width="3.52" height="1.50"/><rect class="b up" x="88.99" y="11.77" width="3.52" height="1.23"/><rect class="b up" x="94.49" y="10.53" width="3.52" height="2.47"/><rect class="b up" x="99.99" y="11.95" width="3.52" height="1.05"/><rect class="b up" x="105.49" y="12.25" width="3.52" height="0.75"/><rect class="b up" x="110.99" y="10.27" width="3.52" height="2.73"/><rect class="b up" x="116.49" y="10.75" width="3.52" height="2.25"/><rect class="b up" x="121.99" y="11.40" width="3.52" height="1.60"/><rect class="b up" x="127.49" y="10.41" width="3.52" height="2.59"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">32.4</td>
+<td class="n dim">22.6</td>
+<td class="n up">+12.4</td>
+<td class="n">17</td>
+<td class="n dim">30.0</td>
+<td class="n up">+34.2</td>
+<td class="n dim">-55.9</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3231</span>
+<span class="cname">緯創</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.82" width="3.52" height="2.18"/><rect class="b up" x="6.49" y="11.14" width="3.52" height="1.86"/><rect class="b up" x="11.99" y="11.05" width="3.52" height="1.95"/><rect class="b up" x="17.49" y="11.18" width="3.52" height="1.82"/><rect class="b up" x="22.99" y="11.03" width="3.52" height="1.97"/><rect class="b up" x="28.49" y="9.69" width="3.52" height="3.31"/><rect class="b up" x="33.99" y="10.21" width="3.52" height="2.79"/><rect class="b up" x="39.49" y="10.86" width="3.52" height="2.14"/><rect class="b up" x="44.99" y="7.38" width="3.52" height="5.62"/><rect class="b up" x="50.49" y="6.27" width="3.52" height="6.73"/><rect class="b up" x="55.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="61.49" y="2.15" width="3.52" height="10.85"/><rect class="b up" x="66.99" y="3.21" width="3.52" height="9.79"/><rect class="b up" x="72.49" y="5.62" width="3.52" height="7.38"/><rect class="b up" x="77.99" y="4.21" width="3.52" height="8.79"/><rect class="b up" x="83.49" y="5.62" width="3.52" height="7.38"/><rect class="b up" x="88.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="94.49" y="1.67" width="3.52" height="11.33"/><rect class="b up" x="99.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="105.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="110.99" y="3.58" width="3.52" height="9.42"/><rect class="b up" x="116.49" y="4.04" width="3.52" height="8.96"/><rect class="b up" x="121.99" y="9.86" width="3.52" height="3.14"/><rect class="b up" x="127.49" y="8.70" width="3.52" height="4.30"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">53.8</td>
+<td class="n dim">117.0</td>
+<td class="n up">+14.6</td>
+<td class="n">3,218</td>
+<td class="n dim">19.6</td>
+<td class="n up">+35.5</td>
+<td class="n dim">-1.8</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3413</span>
+<span class="cname">京鼎</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="8.65" width="3.52" height="4.35"/><rect class="b up" x="6.49" y="8.56" width="3.52" height="4.44"/><rect class="b up" x="11.99" y="8.61" width="3.52" height="4.39"/><rect class="b up" x="17.49" y="9.07" width="3.52" height="3.93"/><rect class="b up" x="22.99" y="9.50" width="3.52" height="3.50"/><rect class="b up" x="28.49" y="10.30" width="3.52" height="2.70"/><rect class="b up" x="33.99" y="9.30" width="3.52" height="3.70"/><rect class="b up" x="39.49" y="8.95" width="3.52" height="4.05"/><rect class="b up" x="44.99" y="9.55" width="3.52" height="3.45"/><rect class="b up" x="50.49" y="9.24" width="3.52" height="3.76"/><rect class="b up" x="55.99" y="9.94" width="3.52" height="3.06"/><rect class="b up" x="61.49" y="10.23" width="3.52" height="2.77"/><rect class="b up" x="66.99" y="11.38" width="3.52" height="1.62"/><rect class="b up" x="72.49" y="11.98" width="3.52" height="1.02"/><rect class="b up" x="77.99" y="10.81" width="3.52" height="2.19"/><rect class="b up" x="83.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="88.99" y="12.37" width="3.52" height="0.70"/><rect class="b up" x="94.49" y="12.72" width="3.52" height="0.70"/><rect class="b up" x="99.99" y="12.06" width="3.52" height="0.94"/><rect class="b up" x="105.49" y="12.66" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="10.86" width="3.52" height="2.14"/><rect class="b up" x="116.49" y="12.50" width="3.52" height="0.70"/><rect class="b up" x="121.99" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="127.49" y="9.82" width="3.52" height="3.18"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">39.8</td>
+<td class="n dim">16.1</td>
+<td class="n up">+23.1</td>
+<td class="n">25</td>
+<td class="n dim">17.1</td>
+<td class="n up">+3.9</td>
+<td class="n dim">-16.9</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6257</span>
+<span class="cname">矽格</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.38" width="3.52" height="0.70"/><rect class="b up" x="6.49" y="12.13" width="3.52" height="0.87"/><rect class="b up" x="11.99" y="11.86" width="3.52" height="1.14"/><rect class="b up" x="17.49" y="11.06" width="3.52" height="1.94"/><rect class="b up" x="22.99" y="11.09" width="3.52" height="1.91"/><rect class="b up" x="28.49" y="11.43" width="3.52" height="1.57"/><rect class="b up" x="33.99" y="11.70" width="3.52" height="1.30"/><rect class="b up" x="39.49" y="11.98" width="3.52" height="1.02"/><rect class="b up" x="44.99" y="12.29" width="3.52" height="0.71"/><rect class="b up" x="50.49" y="12.67" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="12.79" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="12.30" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.49" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.48" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="12.64" width="3.52" height="0.70"/><rect class="b up" x="83.49" y="12.79" width="3.52" height="0.70"/><rect class="b up" x="88.99" y="12.44" width="3.52" height="0.70"/><rect class="b up" x="94.49" y="12.05" width="3.52" height="0.95"/><rect class="b up" x="99.99" y="11.92" width="3.52" height="1.08"/><rect class="b up" x="105.49" y="12.32" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="116.49" y="11.04" width="3.52" height="1.96"/><rect class="b up" x="121.99" y="11.10" width="3.52" height="1.90"/><rect class="b up" x="127.49" y="11.32" width="3.52" height="1.68"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">21.0</td>
+<td class="n dim">12.2</td>
+<td class="n down">-2.7</td>
+<td class="n">20</td>
+<td class="n dim">29.8</td>
+<td class="n down">-1.5</td>
+<td class="n dim">-23.9</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6449</span>
+<span class="cname">鈺邦</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.31" width="3.52" height="0.70"/><rect class="b up" x="6.49" y="12.50" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="11.26" width="3.52" height="1.74"/><rect class="b up" x="17.49" y="10.85" width="3.52" height="2.15"/><rect class="b up" x="22.99" y="11.11" width="3.52" height="1.89"/><rect class="b up" x="28.49" y="10.63" width="3.52" height="2.37"/><rect class="b up" x="33.99" y="12.74" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="9.58" width="3.52" height="3.42"/><rect class="b up" x="44.99" y="9.97" width="3.52" height="3.03"/><rect class="b up" x="50.49" y="10.08" width="3.52" height="2.92"/><rect class="b up" x="55.99" y="9.34" width="3.52" height="3.66"/><rect class="b up" x="61.49" y="10.20" width="3.52" height="2.80"/><rect class="b up" x="66.99" y="10.62" width="3.52" height="2.38"/><rect class="b up" x="72.49" y="11.02" width="3.52" height="1.98"/><rect class="b up" x="77.99" y="11.07" width="3.52" height="1.93"/><rect class="b up" x="83.49" y="11.18" width="3.52" height="1.82"/><rect class="b up" x="88.99" y="11.62" width="3.52" height="1.38"/><rect class="b up" x="94.49" y="10.76" width="3.52" height="2.24"/><rect class="b up" x="99.99" y="9.46" width="3.52" height="3.54"/><rect class="b up" x="105.49" y="11.75" width="3.52" height="1.25"/><rect class="b up" x="110.99" y="11.80" width="3.52" height="1.20"/><rect class="b up" x="116.49" y="10.90" width="3.52" height="2.10"/><rect class="b up" x="121.99" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="127.49" y="11.14" width="3.52" height="1.86"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">23.3</td>
+<td class="n dim">23.6</td>
+<td class="n up">+11.0</td>
+<td class="n">5</td>
+<td class="n dim">29.6</td>
+<td class="n up">+27.8</td>
+<td class="n dim">-49.5</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6669</span>
+<span class="cname">緯穎</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="6.90" width="3.52" height="6.10"/><rect class="b up" x="6.49" y="7.76" width="3.52" height="5.24"/><rect class="b up" x="11.99" y="3.42" width="3.52" height="9.58"/><rect class="b up" x="17.49" y="6.06" width="3.52" height="6.94"/><rect class="b up" x="22.99" y="5.54" width="3.52" height="7.46"/><rect class="b up" x="28.49" y="4.08" width="3.52" height="8.92"/><rect class="b up" x="33.99" y="5.03" width="3.52" height="7.97"/><rect class="b up" x="39.49" y="5.70" width="3.52" height="7.30"/><rect class="b up" x="44.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="50.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="55.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="61.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="66.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="72.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="77.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="83.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="88.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="94.49" y="1.49" width="3.52" height="11.51"/><rect class="b up" x="99.99" y="3.25" width="3.52" height="9.75"/><rect class="b up" x="105.49" y="4.73" width="3.52" height="8.27"/><rect class="b up" x="110.99" y="11.89" width="3.52" height="1.11"/><rect class="b up" x="116.49" y="10.62" width="3.52" height="2.38"/><rect class="b up" x="121.99" y="11.54" width="3.52" height="1.46"/><rect class="b up" x="127.49" y="10.62" width="3.52" height="2.38"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">29.8</td>
+<td class="n dim">108.1</td>
+<td class="n up">+11.6</td>
+<td class="n">1,114</td>
+<td class="n dim">20.8</td>
+<td class="n up">+22.0</td>
+<td class="n dim">-0.6</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">1785</span>
+<span class="cname">光洋科</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.82" width="3.52" height="2.18"/><rect class="b up" x="6.49" y="10.25" width="3.52" height="2.75"/><rect class="b up" x="11.99" y="11.12" width="3.52" height="1.88"/><rect class="b up" x="17.49" y="11.36" width="3.52" height="1.64"/><rect class="b up" x="22.99" y="9.19" width="3.52" height="3.81"/><rect class="b up" x="28.49" y="10.17" width="3.52" height="2.83"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="6.87" width="3.52" height="6.13"/><rect class="b up" x="44.99" y="9.69" width="3.52" height="3.31"/><rect class="b up" x="50.49" y="9.23" width="3.52" height="3.77"/><rect class="b up" x="55.99" y="10.66" width="3.52" height="2.34"/><rect class="b up" x="61.49" y="12.92" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="7.99" width="3.52" height="5.01"/><rect class="b up" x="72.49" y="10.22" width="3.52" height="2.78"/><rect class="b up" x="77.99" y="11.48" width="3.52" height="1.52"/><rect class="b up" x="83.49" y="9.21" width="3.52" height="3.79"/><rect class="b up" x="88.99" y="10.89" width="3.52" height="2.11"/><rect class="b up" x="94.49" y="9.50" width="3.52" height="3.50"/><rect class="b up" x="99.99" y="7.58" width="3.52" height="5.42"/><rect class="b up" x="105.49" y="7.97" width="3.52" height="5.03"/><rect class="b up" x="110.99" y="5.35" width="3.52" height="7.65"/><rect class="b up" x="116.49" y="9.07" width="3.52" height="3.93"/><rect class="b up" x="121.99" y="5.36" width="3.52" height="7.64"/><rect class="b up" x="127.49" y="7.34" width="3.52" height="5.66"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">70.8</td>
+<td class="n dim">56.3</td>
+<td class="n down">-24.7</td>
+<td class="n">46</td>
+<td class="n dim">22.0</td>
+<td class="n down">-30.3</td>
+<td class="n dim">-37.1</td>
+<td class="ind">其他電子業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3357</span>
+<span class="cname">臺慶科</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="9.06" width="3.52" height="3.94"/><rect class="b up" x="6.49" y="11.05" width="3.52" height="1.95"/><rect class="b up" x="11.99" y="9.63" width="3.52" height="3.37"/><rect class="b up" x="17.49" y="10.37" width="3.52" height="2.63"/><rect class="b up" x="22.99" y="10.70" width="3.52" height="2.30"/><rect class="b up" x="28.49" y="9.06" width="3.52" height="3.94"/><rect class="b up" x="33.99" y="12.38" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="7.80" width="3.52" height="5.20"/><rect class="b up" x="44.99" y="10.02" width="3.52" height="2.98"/><rect class="b up" x="50.49" y="10.10" width="3.52" height="2.90"/><rect class="b up" x="55.99" y="12.22" width="3.52" height="0.78"/><rect class="b up" x="61.49" y="12.42" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.30" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.01" width="3.52" height="0.99"/><rect class="b up" x="77.99" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="83.49" y="11.45" width="3.52" height="1.55"/><rect class="b up" x="88.99" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="94.49" y="10.90" width="3.52" height="2.10"/><rect class="b up" x="99.99" y="10.96" width="3.52" height="2.04"/><rect class="b down" x="105.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="12.03" width="3.52" height="0.97"/><rect class="b up" x="116.49" y="11.77" width="3.52" height="1.23"/><rect class="b up" x="121.99" y="9.98" width="3.52" height="3.02"/><rect class="b up" x="127.49" y="8.41" width="3.52" height="4.59"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">57.4</td>
+<td class="n dim">20.3</td>
+<td class="n up">+19.6</td>
+<td class="n">8</td>
+<td class="n dim">21.6</td>
+<td class="n up">+11.5</td>
+<td class="n dim">-39.9</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3709</span>
+<span class="cname">鑫聯大投控</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="9.37" width="3.52" height="3.63"/><rect class="b up" x="6.49" y="9.63" width="3.52" height="3.37"/><rect class="b up" x="11.99" y="8.94" width="3.52" height="4.06"/><rect class="b up" x="17.49" y="10.90" width="3.52" height="2.10"/><rect class="b up" x="22.99" y="8.46" width="3.52" height="4.54"/><rect class="b up" x="28.49" y="4.22" width="3.52" height="8.78"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="6.62" width="3.52" height="6.38"/><rect class="b up" x="44.99" y="4.85" width="3.52" height="8.15"/><rect class="b up" x="50.49" y="3.64" width="3.52" height="9.36"/><rect class="b up" x="55.99" y="8.89" width="3.52" height="4.11"/><rect class="b up" x="61.49" y="4.42" width="3.52" height="8.58"/><rect class="b up" x="66.99" y="10.98" width="3.52" height="2.02"/><rect class="b up" x="72.49" y="11.97" width="3.52" height="1.03"/><rect class="b up" x="77.99" y="10.06" width="3.52" height="2.94"/><rect class="b up" x="83.49" y="10.45" width="3.52" height="2.55"/><rect class="b up" x="88.99" y="10.98" width="3.52" height="2.02"/><rect class="b up" x="94.49" y="12.66" width="3.52" height="0.70"/><rect class="b up" x="99.99" y="2.38" width="3.52" height="10.62"/><rect class="b down" x="105.49" y="13.00" width="3.52" height="1.84"/><rect class="b up" x="110.99" y="11.14" width="3.52" height="1.86"/><rect class="b up" x="116.49" y="12.27" width="3.52" height="0.73"/><rect class="b up" x="121.99" y="12.88" width="3.52" height="0.70"/><rect class="b up" x="127.49" y="7.23" width="3.52" height="5.77"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">72.1</td>
+<td class="n dim">29.3</td>
+<td class="n up">+70.6</td>
+<td class="n">76</td>
+<td class="n dim">8.0</td>
+<td class="n down">-15.4</td>
+<td class="n dim">-15.4</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">5536</span>
+<span class="cname">聖暉*</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.80" width="3.52" height="1.20"/><rect class="b up" x="6.49" y="11.31" width="3.52" height="1.69"/><rect class="b up" x="11.99" y="11.59" width="3.52" height="1.41"/><rect class="b up" x="17.49" y="10.23" width="3.52" height="2.77"/><rect class="b up" x="22.99" y="9.90" width="3.52" height="3.10"/><rect class="b up" x="28.49" y="8.58" width="3.52" height="4.42"/><rect class="b up" x="33.99" y="10.55" width="3.52" height="2.45"/><rect class="b up" x="39.49" y="4.88" width="3.52" height="8.12"/><rect class="b up" x="44.99" y="8.81" width="3.52" height="4.19"/><rect class="b up" x="50.49" y="9.41" width="3.52" height="3.59"/><rect class="b up" x="55.99" y="9.38" width="3.52" height="3.62"/><rect class="b up" x="61.49" y="9.99" width="3.52" height="3.01"/><rect class="b up" x="66.99" y="7.37" width="3.52" height="5.63"/><rect class="b up" x="72.49" y="9.65" width="3.52" height="3.35"/><rect class="b up" x="77.99" y="10.70" width="3.52" height="2.30"/><rect class="b up" x="83.49" y="11.58" width="3.52" height="1.42"/><rect class="b up" x="88.99" y="11.40" width="3.52" height="1.60"/><rect class="b up" x="94.49" y="12.19" width="3.52" height="0.81"/><rect class="b up" x="99.99" y="9.90" width="3.52" height="3.10"/><rect class="b up" x="105.49" y="12.78" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="8.19" width="3.52" height="4.81"/><rect class="b up" x="116.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="121.99" y="10.78" width="3.52" height="2.22"/><rect class="b up" x="127.49" y="11.01" width="3.52" height="1.99"/></svg></td>
+<td class="streak"><span class="sv">24</span><span class="meter" title="24 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i></span></td>
+<td class="n up">24.9</td>
+<td class="n dim">29.9</td>
+<td class="n down">-2.9</td>
+<td class="n">48</td>
+<td class="n dim">28.3</td>
+<td class="n up">+22.2</td>
+<td class="n dim">-27.5</td>
+<td class="ind">其他電子業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3004</span>
+<span class="cname">豐達科</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.83" width="3.52" height="1.17"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="11.93" width="3.52" height="1.07"/><rect class="b up" x="17.49" y="12.73" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="28.49" y="12.14" width="3.52" height="0.86"/><rect class="b up" x="33.99" y="12.98" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="11.21" width="3.52" height="1.79"/><rect class="b up" x="44.99" y="11.81" width="3.52" height="1.19"/><rect class="b up" x="50.49" y="11.58" width="3.52" height="1.42"/><rect class="b up" x="55.99" y="12.81" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="11.22" width="3.52" height="1.78"/><rect class="b up" x="66.99" y="12.54" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="11.70" width="3.52" height="1.30"/><rect class="b up" x="77.99" y="11.35" width="3.52" height="1.65"/><rect class="b up" x="83.49" y="10.96" width="3.52" height="2.04"/><rect class="b up" x="88.99" y="11.17" width="3.52" height="1.83"/><rect class="b up" x="94.49" y="11.43" width="3.52" height="1.57"/><rect class="b up" x="99.99" y="10.18" width="3.52" height="2.82"/><rect class="b up" x="105.49" y="11.43" width="3.52" height="1.57"/><rect class="b up" x="110.99" y="10.50" width="3.52" height="2.50"/><rect class="b up" x="116.49" y="11.34" width="3.52" height="1.66"/><rect class="b up" x="121.99" y="8.50" width="3.52" height="4.50"/><rect class="b up" x="127.49" y="9.27" width="3.52" height="3.73"/></svg></td>
+<td class="streak"><span class="sv">22</span><span class="meter" title="22 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">46.6</td>
+<td class="n dim">26.7</td>
+<td class="n down">-9.6</td>
+<td class="n">5</td>
+<td class="n dim">19.5</td>
+<td class="n up">+9.8</td>
+<td class="n dim">-19.4</td>
+<td class="ind">鋼鐵工業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">1714</span>
+<span class="cname">和桐</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b down" x="0.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="6.49" y="11.90" width="3.52" height="1.10"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="0.89"/><rect class="b up" x="17.49" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="22.99" y="10.84" width="3.52" height="2.16"/><rect class="b up" x="28.49" y="12.99" width="3.52" height="0.70"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="9.33" width="3.52" height="3.67"/><rect class="b up" x="44.99" y="12.29" width="3.52" height="0.71"/><rect class="b up" x="50.49" y="11.99" width="3.52" height="1.01"/><rect class="b up" x="55.99" y="12.12" width="3.52" height="0.88"/><rect class="b up" x="61.49" y="11.48" width="3.52" height="1.52"/><rect class="b up" x="66.99" y="11.31" width="3.52" height="1.69"/><rect class="b up" x="72.49" y="12.18" width="3.52" height="0.82"/><rect class="b up" x="77.99" y="10.67" width="3.52" height="2.33"/><rect class="b up" x="83.49" y="12.19" width="3.52" height="0.81"/><rect class="b up" x="88.99" y="12.25" width="3.52" height="0.75"/><rect class="b up" x="94.49" y="9.46" width="3.52" height="3.54"/><rect class="b up" x="99.99" y="8.36" width="3.52" height="4.64"/><rect class="b up" x="105.49" y="11.81" width="3.52" height="1.19"/><rect class="b up" x="110.99" y="9.56" width="3.52" height="3.44"/><rect class="b up" x="116.49" y="7.26" width="3.52" height="5.74"/><rect class="b up" x="121.99" y="6.22" width="3.52" height="6.78"/><rect class="b up" x="127.49" y="7.13" width="3.52" height="5.87"/></svg></td>
+<td class="streak"><span class="sv">21</span><span class="meter" title="21 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">73.4</td>
+<td class="n dim">39.2</td>
+<td class="n down">-11.4</td>
+<td class="n">31</td>
+<td class="n dim">22.7</td>
+<td class="n up">+75.5</td>
+<td class="n dim">-28.8</td>
+<td class="ind">化學工業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2301</span>
+<span class="cname">光寶科</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.81" width="3.52" height="0.70"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.74"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="1.28"/><rect class="b up" x="17.49" y="12.90" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.90" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="12.31" width="3.52" height="0.70"/><rect class="b up" x="33.99" y="11.19" width="3.52" height="1.81"/><rect class="b up" x="39.49" y="10.19" width="3.52" height="2.81"/><rect class="b up" x="44.99" y="11.10" width="3.52" height="1.90"/><rect class="b up" x="50.49" y="10.87" width="3.52" height="2.13"/><rect class="b up" x="55.99" y="11.22" width="3.52" height="1.78"/><rect class="b up" x="61.49" y="11.71" width="3.52" height="1.29"/><rect class="b up" x="66.99" y="12.41" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="10.62" width="3.52" height="2.38"/><rect class="b up" x="77.99" y="10.58" width="3.52" height="2.42"/><rect class="b up" x="83.49" y="11.18" width="3.52" height="1.82"/><rect class="b up" x="88.99" y="11.89" width="3.52" height="1.11"/><rect class="b up" x="94.49" y="12.09" width="3.52" height="0.91"/><rect class="b up" x="99.99" y="11.70" width="3.52" height="1.30"/><rect class="b up" x="105.49" y="11.61" width="3.52" height="1.39"/><rect class="b up" x="110.99" y="11.13" width="3.52" height="1.87"/><rect class="b up" x="116.49" y="11.04" width="3.52" height="1.96"/><rect class="b up" x="121.99" y="10.63" width="3.52" height="2.37"/><rect class="b up" x="127.49" y="10.04" width="3.52" height="2.96"/></svg></td>
+<td class="streak"><span class="sv">21</span><span class="meter" title="21 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">37.0</td>
+<td class="n dim">22.0</td>
+<td class="n up">+7.4</td>
+<td class="n">187</td>
+<td class="n dim">29.5</td>
+<td class="n up">+24.3</td>
+<td class="n dim">0.0</td>
+<td class="ind">電腦及週邊設備業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">5439</span>
+<span class="cname">高技</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b down" x="0.99" y="13.00" width="3.52" height="1.06"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="12.81" width="3.52" height="0.70"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.64" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="11.59" width="3.52" height="1.41"/><rect class="b up" x="33.99" y="11.97" width="3.52" height="1.03"/><rect class="b up" x="39.49" y="7.62" width="3.52" height="5.38"/><rect class="b up" x="44.99" y="6.40" width="3.52" height="6.60"/><rect class="b up" x="50.49" y="2.95" width="3.52" height="10.05"/><rect class="b up" x="55.99" y="5.81" width="3.52" height="7.19"/><rect class="b up" x="61.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="66.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="72.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="77.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="83.49" y="1.29" width="3.52" height="11.71"/><rect class="b up" x="88.99" y="2.17" width="3.52" height="10.83"/><rect class="b up" x="94.49" y="4.08" width="3.52" height="8.92"/><rect class="b up" x="99.99" y="2.64" width="3.52" height="10.36"/><rect class="b up" x="105.49" y="7.98" width="3.52" height="5.02"/><rect class="b up" x="110.99" y="8.18" width="3.52" height="4.82"/><rect class="b up" x="116.49" y="10.90" width="3.52" height="2.10"/><rect class="b up" x="121.99" y="8.34" width="3.52" height="4.66"/><rect class="b up" x="127.49" y="11.23" width="3.52" height="1.77"/></svg></td>
+<td class="streak"><span class="sv">20</span><span class="meter" title="20 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">22.1</td>
+<td class="n dim">112.4</td>
+<td class="n down">-36.2</td>
+<td class="n">11</td>
+<td class="n dim">14.8</td>
+<td class="n down">-38.2</td>
+<td class="n dim">-45.7</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2027</span>
+<span class="cname">大成鋼</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b down" x="0.99" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="1.23"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="1.13"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="12.68" width="3.52" height="0.70"/><rect class="b up" x="33.99" y="12.54" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="44.99" y="11.42" width="3.52" height="1.58"/><rect class="b up" x="50.49" y="12.42" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="12.88" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="12.36" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="11.52" width="3.52" height="1.48"/><rect class="b up" x="72.49" y="11.96" width="3.52" height="1.04"/><rect class="b up" x="77.99" y="10.85" width="3.52" height="2.15"/><rect class="b up" x="83.49" y="11.86" width="3.52" height="1.14"/><rect class="b up" x="88.99" y="12.35" width="3.52" height="0.70"/><rect class="b up" x="94.49" y="11.19" width="3.52" height="1.81"/><rect class="b up" x="99.99" y="11.41" width="3.52" height="1.59"/><rect class="b up" x="105.49" y="11.91" width="3.52" height="1.09"/><rect class="b up" x="110.99" y="10.99" width="3.52" height="2.01"/><rect class="b up" x="116.49" y="9.98" width="3.52" height="3.02"/><rect class="b up" x="121.99" y="9.60" width="3.52" height="3.40"/><rect class="b up" x="127.49" y="9.50" width="3.52" height="3.50"/></svg></td>
+<td class="streak"><span class="sv">19</span><span class="meter" title="19 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">43.7</td>
+<td class="n dim">23.8</td>
+<td class="n up">+1.2</td>
+<td class="n">119</td>
+<td class="n dim">12.9</td>
+<td class="n up">+22.1</td>
+<td class="n dim">0.0</td>
+<td class="ind">鋼鐵工業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2884</span>
+<span class="cname">玉山金</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="9.74" width="3.52" height="3.26"/><rect class="b up" x="6.49" y="10.39" width="3.52" height="2.61"/><rect class="b up" x="11.99" y="10.94" width="3.52" height="2.06"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="1.14"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="1.14"/><rect class="b up" x="28.49" y="11.86" width="3.52" height="1.14"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="8.50" width="3.52" height="4.50"/><rect class="b up" x="44.99" y="11.12" width="3.52" height="1.88"/><rect class="b up" x="50.49" y="11.50" width="3.52" height="1.50"/><rect class="b up" x="55.99" y="12.36" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="11.13" width="3.52" height="1.87"/><rect class="b up" x="66.99" y="12.50" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="12.46" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="83.49" y="8.59" width="3.52" height="4.41"/><rect class="b up" x="88.99" y="9.27" width="3.52" height="3.73"/><rect class="b up" x="94.49" y="11.80" width="3.52" height="1.20"/><rect class="b up" x="99.99" y="9.76" width="3.52" height="3.24"/><rect class="b up" x="105.49" y="12.68" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="12.18" width="3.52" height="0.82"/><rect class="b up" x="116.49" y="9.18" width="3.52" height="3.82"/><rect class="b up" x="121.99" y="11.02" width="3.52" height="1.98"/><rect class="b up" x="127.49" y="10.98" width="3.52" height="2.02"/></svg></td>
+<td class="streak"><span class="sv">19</span><span class="meter" title="19 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">25.3</td>
+<td class="n dim">24.9</td>
+<td class="n up">+0.5</td>
+<td class="n">94</td>
+<td class="n dim">17.3</td>
+<td class="n up">+21.9</td>
+<td class="n dim">-1.7</td>
+<td class="ind">金融保險業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">8271</span>
+<span class="cname">宇瞻</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.68" width="3.52" height="1.32"/><rect class="b up" x="6.49" y="12.82" width="3.52" height="0.70"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="1.38"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="1.13"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="11.82" width="3.52" height="1.18"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.76"/><rect class="b up" x="39.49" y="12.08" width="3.52" height="0.92"/><rect class="b up" x="44.99" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="50.49" y="10.84" width="3.52" height="2.16"/><rect class="b up" x="55.99" y="9.24" width="3.52" height="3.76"/><rect class="b up" x="61.49" y="8.31" width="3.52" height="4.69"/><rect class="b up" x="66.99" y="7.23" width="3.52" height="5.77"/><rect class="b up" x="72.49" y="8.96" width="3.52" height="4.04"/><rect class="b up" x="77.99" y="5.91" width="3.52" height="7.09"/><rect class="b up" x="83.49" y="6.88" width="3.52" height="6.12"/><rect class="b up" x="88.99" y="10.14" width="3.52" height="2.86"/><rect class="b up" x="94.49" y="10.30" width="3.52" height="2.70"/><rect class="b up" x="99.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="105.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="110.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="116.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="121.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="127.49" y="1.00" width="3.52" height="12.00"/></svg></td>
+<td class="streak"><span class="sv">19</span><span class="meter" title="19 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">200.6</td>
+<td class="n dim">155.2</td>
+<td class="n down">-23.8</td>
+<td class="n">29</td>
+<td class="n dim">5.6</td>
+<td class="n down">-5.7</td>
+<td class="n dim">-5.7</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6435</span>
+<span class="cname">大中</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.73" width="3.52" height="0.70"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="12.65" width="3.52" height="0.70"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="11.85" width="3.52" height="1.15"/><rect class="b up" x="33.99" y="10.10" width="3.52" height="2.90"/><rect class="b up" x="39.49" y="10.19" width="3.52" height="2.81"/><rect class="b up" x="44.99" y="11.25" width="3.52" height="1.75"/><rect class="b up" x="50.49" y="10.11" width="3.52" height="2.89"/><rect class="b up" x="55.99" y="11.55" width="3.52" height="1.45"/><rect class="b up" x="61.49" y="10.51" width="3.52" height="2.49"/><rect class="b up" x="66.99" y="11.50" width="3.52" height="1.50"/><rect class="b up" x="72.49" y="11.75" width="3.52" height="1.25"/><rect class="b up" x="77.99" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="83.49" y="11.59" width="3.52" height="1.41"/><rect class="b up" x="88.99" y="10.69" width="3.52" height="2.31"/><rect class="b up" x="94.49" y="10.28" width="3.52" height="2.72"/><rect class="b up" x="99.99" y="12.97" width="3.52" height="0.70"/><rect class="b up" x="105.49" y="12.89" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="12.12" width="3.52" height="0.88"/><rect class="b up" x="116.49" y="11.92" width="3.52" height="1.08"/><rect class="b up" x="121.99" y="11.22" width="3.52" height="1.78"/><rect class="b up" x="127.49" y="11.27" width="3.52" height="1.73"/></svg></td>
+<td class="streak"><span class="sv">19</span><span class="meter" title="19 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">21.6</td>
+<td class="n dim">16.4</td>
+<td class="n down">-0.6</td>
+<td class="n">3</td>
+<td class="n dim">23.6</td>
+<td class="n up">+24.8</td>
+<td class="n dim">-37.4</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3135</span>
+<span class="cname">凌航</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.67" width="3.52" height="2.33"/><rect class="b up" x="6.49" y="12.50" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="10.29" width="3.52" height="2.71"/><rect class="b up" x="17.49" y="8.82" width="3.52" height="4.18"/><rect class="b up" x="22.99" y="11.56" width="3.52" height="1.44"/><rect class="b down" x="28.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="2.53"/><rect class="b up" x="39.49" y="10.82" width="3.52" height="2.18"/><rect class="b up" x="44.99" y="9.67" width="3.52" height="3.33"/><rect class="b up" x="50.49" y="9.14" width="3.52" height="3.86"/><rect class="b up" x="55.99" y="8.60" width="3.52" height="4.40"/><rect class="b up" x="61.49" y="8.26" width="3.52" height="4.74"/><rect class="b up" x="66.99" y="5.48" width="3.52" height="7.52"/><rect class="b up" x="72.49" y="11.23" width="3.52" height="1.77"/><rect class="b up" x="77.99" y="10.54" width="3.52" height="2.46"/><rect class="b up" x="83.49" y="12.23" width="3.52" height="0.77"/><rect class="b up" x="88.99" y="10.58" width="3.52" height="2.42"/><rect class="b up" x="94.49" y="3.42" width="3.52" height="9.58"/><rect class="b up" x="99.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="105.49" y="4.67" width="3.52" height="8.33"/><rect class="b up" x="110.99" y="1.76" width="3.52" height="11.24"/><rect class="b up" x="116.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="121.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="127.49" y="1.00" width="3.52" height="12.00"/></svg></td>
+<td class="streak"><span class="sv">16</span><span class="meter" title="16 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">150.0</td>
+<td class="n dim">157.3</td>
+<td class="n down">-84.5</td>
+<td class="n">16</td>
+<td class="n dim">11.7</td>
+<td class="n up">+2.0</td>
+<td class="n dim">-30.7</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2404</span>
+<span class="cname">漢唐</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b down" x="0.99" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="5.02"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="2.57"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="3.58"/><rect class="b down" x="28.49" y="13.00" width="3.52" height="1.06"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="1.20"/><rect class="b up" x="39.49" y="11.32" width="3.52" height="1.68"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="1.30"/><rect class="b up" x="50.49" y="12.42" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="10.76" width="3.52" height="2.24"/><rect class="b up" x="61.49" y="8.61" width="3.52" height="4.39"/><rect class="b up" x="66.99" y="8.84" width="3.52" height="4.16"/><rect class="b up" x="72.49" y="7.78" width="3.52" height="5.22"/><rect class="b up" x="77.99" y="4.82" width="3.52" height="8.18"/><rect class="b up" x="83.49" y="8.47" width="3.52" height="4.53"/><rect class="b up" x="88.99" y="4.97" width="3.52" height="8.03"/><rect class="b up" x="94.49" y="9.70" width="3.52" height="3.30"/><rect class="b up" x="99.99" y="8.29" width="3.52" height="4.71"/><rect class="b up" x="105.49" y="7.49" width="3.52" height="5.51"/><rect class="b up" x="110.99" y="4.95" width="3.52" height="8.05"/><rect class="b up" x="116.49" y="4.82" width="3.52" height="8.18"/><rect class="b up" x="121.99" y="6.20" width="3.52" height="6.80"/><rect class="b up" x="127.49" y="8.93" width="3.52" height="4.07"/></svg></td>
+<td class="streak"><span class="sv">15</span><span class="meter" title="15 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">50.9</td>
+<td class="n dim">73.7</td>
+<td class="n down">-34.1</td>
+<td class="n">87</td>
+<td class="n dim">20.6</td>
+<td class="n up">+14.4</td>
+<td class="n dim">-16.2</td>
+<td class="ind">其他電子業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2890</span>
+<span class="cname">永豐金</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.63" width="3.52" height="1.37"/><rect class="b up" x="6.49" y="11.90" width="3.52" height="1.10"/><rect class="b up" x="11.99" y="11.18" width="3.52" height="1.82"/><rect class="b up" x="17.49" y="10.05" width="3.52" height="2.95"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="12.03" width="3.52" height="0.97"/><rect class="b up" x="33.99" y="11.77" width="3.52" height="1.23"/><rect class="b up" x="39.49" y="10.37" width="3.52" height="2.63"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="50.49" y="12.74" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="12.60" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="12.55" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.69" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="11.22" width="3.52" height="1.78"/><rect class="b up" x="77.99" y="11.22" width="3.52" height="1.78"/><rect class="b up" x="83.49" y="9.89" width="3.52" height="3.11"/><rect class="b up" x="88.99" y="9.77" width="3.52" height="3.23"/><rect class="b up" x="94.49" y="11.74" width="3.52" height="1.26"/><rect class="b up" x="99.99" y="8.59" width="3.52" height="4.41"/><rect class="b up" x="105.49" y="11.94" width="3.52" height="1.06"/><rect class="b up" x="110.99" y="8.94" width="3.52" height="4.06"/><rect class="b up" x="116.49" y="6.01" width="3.52" height="6.99"/><rect class="b up" x="121.99" y="6.38" width="3.52" height="6.62"/><rect class="b up" x="127.49" y="8.93" width="3.52" height="4.07"/></svg></td>
+<td class="streak"><span class="sv">15</span><span class="meter" title="15 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">50.9</td>
+<td class="n dim">40.3</td>
+<td class="n down">-31.8</td>
+<td class="n">97</td>
+<td class="n dim">18.9</td>
+<td class="n up">+32.8</td>
+<td class="n dim">-3.3</td>
+<td class="ind">金融保險業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">4739</span>
+<span class="cname">康普</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="12.94" width="3.52" height="0.70"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="1.99"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="1.18"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="1.11"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="1.56"/><rect class="b down" x="28.49" y="13.00" width="3.52" height="1.26"/><rect class="b up" x="33.99" y="11.33" width="3.52" height="1.67"/><rect class="b down" x="39.49" y="13.00" width="3.52" height="2.59"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="50.49" y="9.78" width="3.52" height="3.22"/><rect class="b up" x="55.99" y="11.17" width="3.52" height="1.83"/><rect class="b up" x="61.49" y="10.47" width="3.52" height="2.53"/><rect class="b up" x="66.99" y="11.81" width="3.52" height="1.19"/><rect class="b up" x="72.49" y="3.69" width="3.52" height="9.31"/><rect class="b up" x="77.99" y="4.20" width="3.52" height="8.80"/><rect class="b up" x="83.49" y="5.16" width="3.52" height="7.84"/><rect class="b up" x="88.99" y="1.14" width="3.52" height="11.86"/><rect class="b up" x="94.49" y="5.15" width="3.52" height="7.85"/><rect class="b up" x="99.99" y="4.27" width="3.52" height="8.73"/><rect class="b up" x="105.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="110.99" y="4.71" width="3.52" height="8.29"/><rect class="b up" x="116.49" y="5.30" width="3.52" height="7.70"/><rect class="b up" x="121.99" y="1.72" width="3.52" height="11.28"/><rect class="b up" x="127.49" y="3.90" width="3.52" height="9.10"/></svg></td>
+<td class="streak"><span class="sv">15</span><span class="meter" title="15 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">113.8</td>
+<td class="n dim">111.8</td>
+<td class="n down">-27.2</td>
+<td class="n">10</td>
+<td class="n dim">25.7</td>
+<td class="n up">+0.6</td>
+<td class="n dim">-32.8</td>
+<td class="ind">化學工業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3260</span>
+<span class="cname">威剛</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.28" width="3.52" height="2.72"/><rect class="b up" x="6.49" y="12.85" width="3.52" height="0.70"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="0.81"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="1.18"/><rect class="b down" x="28.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="1.69"/><rect class="b up" x="39.49" y="12.99" width="3.52" height="0.70"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="50.49" y="12.86" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="10.66" width="3.52" height="2.34"/><rect class="b up" x="61.49" y="8.28" width="3.52" height="4.72"/><rect class="b up" x="66.99" y="9.84" width="3.52" height="3.16"/><rect class="b up" x="72.49" y="7.84" width="3.52" height="5.16"/><rect class="b up" x="77.99" y="8.10" width="3.52" height="4.90"/><rect class="b up" x="83.49" y="10.53" width="3.52" height="2.47"/><rect class="b up" x="88.99" y="8.18" width="3.52" height="4.82"/><rect class="b up" x="94.49" y="4.90" width="3.52" height="8.10"/><rect class="b up" x="99.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="105.49" y="3.86" width="3.52" height="9.14"/><rect class="b up" x="110.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="116.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="121.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="127.49" y="1.00" width="3.52" height="12.00"/></svg></td>
+<td class="streak"><span class="sv">15</span><span class="meter" title="15 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">212.1</td>
+<td class="n dim">120.4</td>
+<td class="n up">+1.7</td>
+<td class="n">147</td>
+<td class="n dim">7.9</td>
+<td class="n down">-7.0</td>
+<td class="n dim">-17.9</td>
+<td class="ind">半導體業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3028</span>
+<span class="cname">增你強</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="6.49" y="12.94" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="12.93" width="3.52" height="0.70"/><rect class="b up" x="17.49" y="12.81" width="3.52" height="0.70"/><rect class="b up" x="22.99" y="12.61" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="12.43" width="3.52" height="0.70"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="11.35" width="3.52" height="1.65"/><rect class="b up" x="44.99" y="12.74" width="3.52" height="0.70"/><rect class="b down" x="50.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="55.99" y="12.52" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="66.99" y="12.07" width="3.52" height="0.93"/><rect class="b up" x="72.49" y="12.11" width="3.52" height="0.89"/><rect class="b up" x="77.99" y="11.15" width="3.52" height="1.85"/><rect class="b up" x="83.49" y="10.07" width="3.52" height="2.93"/><rect class="b up" x="88.99" y="11.10" width="3.52" height="1.90"/><rect class="b up" x="94.49" y="10.98" width="3.52" height="2.02"/><rect class="b up" x="99.99" y="4.32" width="3.52" height="8.68"/><rect class="b up" x="105.49" y="9.44" width="3.52" height="3.56"/><rect class="b up" x="110.99" y="2.98" width="3.52" height="10.02"/><rect class="b up" x="116.49" y="4.50" width="3.52" height="8.50"/><rect class="b up" x="121.99" y="4.80" width="3.52" height="8.20"/><rect class="b up" x="127.49" y="7.75" width="3.52" height="5.25"/></svg></td>
+<td class="streak"><span class="sv">14</span><span class="meter" title="14 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">65.6</td>
+<td class="n dim">57.0</td>
+<td class="n down">-36.9</td>
+<td class="n">60</td>
+<td class="n dim">13.2</td>
+<td class="n down">-7.6</td>
+<td class="n dim">-14.8</td>
+<td class="ind">電子通路業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2880</span>
+<span class="cname">華南金</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.07" width="3.52" height="1.93"/><rect class="b up" x="6.49" y="12.44" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="12.06" width="3.52" height="0.94"/><rect class="b up" x="17.49" y="11.18" width="3.52" height="1.82"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="0.92"/><rect class="b up" x="28.49" y="11.54" width="3.52" height="1.46"/><rect class="b up" x="33.99" y="12.97" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="12.07" width="3.52" height="0.93"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="50.49" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="55.99" y="13.00" width="3.52" height="1.38"/><rect class="b up" x="61.49" y="12.77" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.60" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="11.89" width="3.52" height="1.11"/><rect class="b up" x="77.99" y="12.27" width="3.52" height="0.73"/><rect class="b up" x="83.49" y="12.37" width="3.52" height="0.70"/><rect class="b up" x="88.99" y="11.67" width="3.52" height="1.33"/><rect class="b up" x="94.49" y="12.18" width="3.52" height="0.82"/><rect class="b up" x="99.99" y="10.94" width="3.52" height="2.06"/><rect class="b up" x="105.49" y="12.37" width="3.52" height="0.70"/><rect class="b up" x="110.99" y="10.39" width="3.52" height="2.61"/><rect class="b up" x="116.49" y="8.23" width="3.52" height="4.77"/><rect class="b up" x="121.99" y="7.20" width="3.52" height="5.80"/><rect class="b up" x="127.49" y="10.66" width="3.52" height="2.34"/></svg></td>
+<td class="streak"><span class="sv">13</span><span class="meter" title="13 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">29.2</td>
+<td class="n dim">24.2</td>
+<td class="n down">-43.3</td>
+<td class="n">75</td>
+<td class="n dim">20.9</td>
+<td class="n up">+31.4</td>
+<td class="n dim">-0.1</td>
+<td class="ind">金融保險業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6197</span>
+<span class="cname">佳必琪</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="8.45" width="3.52" height="4.55"/><rect class="b up" x="6.49" y="8.99" width="3.52" height="4.01"/><rect class="b up" x="11.99" y="11.29" width="3.52" height="1.71"/><rect class="b up" x="17.49" y="11.92" width="3.52" height="1.08"/><rect class="b up" x="22.99" y="12.37" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="11.83" width="3.52" height="1.17"/><rect class="b up" x="33.99" y="12.86" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="10.14" width="3.52" height="2.86"/><rect class="b up" x="44.99" y="11.91" width="3.52" height="1.09"/><rect class="b up" x="50.49" y="9.54" width="3.52" height="3.46"/><rect class="b down" x="55.99" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="61.49" y="12.78" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.03" width="3.52" height="0.97"/><rect class="b up" x="72.49" y="12.71" width="3.52" height="0.70"/><rect class="b up" x="77.99" y="11.27" width="3.52" height="1.73"/><rect class="b up" x="83.49" y="11.38" width="3.52" height="1.62"/><rect class="b up" x="88.99" y="12.98" width="3.52" height="0.70"/><rect class="b up" x="94.49" y="11.86" width="3.52" height="1.14"/><rect class="b up" x="99.99" y="10.53" width="3.52" height="2.47"/><rect class="b up" x="105.49" y="11.38" width="3.52" height="1.62"/><rect class="b up" x="110.99" y="12.02" width="3.52" height="0.98"/><rect class="b up" x="116.49" y="12.58" width="3.52" height="0.70"/><rect class="b up" x="121.99" y="9.66" width="3.52" height="3.34"/><rect class="b up" x="127.49" y="9.38" width="3.52" height="3.62"/></svg></td>
+<td class="streak"><span class="sv">13</span><span class="meter" title="13 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">45.2</td>
+<td class="n dim">19.0</td>
+<td class="n up">+3.4</td>
+<td class="n">9</td>
+<td class="n dim">26.0</td>
+<td class="n up">+48.0</td>
+<td class="n dim">-14.9</td>
+<td class="ind">電子零組件業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">6015</span>
+<span class="cname">宏遠證</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b down" x="0.99" y="13.00" width="3.52" height="3.45"/><rect class="b up" x="6.49" y="10.10" width="3.52" height="2.90"/><rect class="b up" x="11.99" y="8.34" width="3.52" height="4.66"/><rect class="b up" x="17.49" y="1.00" width="3.52" height="12.00"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="5.97"/><rect class="b down" x="28.49" y="13.00" width="3.52" height="2.10"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="1.02"/><rect class="b down" x="39.49" y="13.00" width="3.52" height="5.09"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="8.73"/><rect class="b down" x="50.49" y="13.00" width="3.52" height="8.94"/><rect class="b down" x="55.99" y="13.00" width="3.52" height="2.98"/><rect class="b up" x="61.49" y="12.82" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="11.93" width="3.52" height="1.07"/><rect class="b up" x="72.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="77.99" y="6.55" width="3.52" height="6.45"/><rect class="b up" x="83.49" y="8.23" width="3.52" height="4.77"/><rect class="b up" x="88.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="94.49" y="6.02" width="3.52" height="6.98"/><rect class="b up" x="99.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="105.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="110.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="116.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="121.99" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="127.49" y="1.00" width="3.52" height="12.00"/></svg></td>
+<td class="streak"><span class="sv">13</span><span class="meter" title="13 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">270.8</td>
+<td class="n dim">579.9</td>
+<td class="n down">-72.0</td>
+<td class="n">6</td>
+<td class="n dim">8.4</td>
+<td class="n down">-4.0</td>
+<td class="n dim">-32.3</td>
+<td class="ind">金融業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">2889</span>
+<span class="cname">國票金</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.53" width="3.52" height="1.47"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="11.99" y="10.88" width="3.52" height="2.12"/><rect class="b up" x="17.49" y="8.42" width="3.52" height="4.58"/><rect class="b up" x="22.99" y="12.50" width="3.52" height="0.70"/><rect class="b up" x="28.49" y="12.05" width="3.52" height="0.95"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="1.73"/><rect class="b up" x="39.49" y="12.90" width="3.52" height="0.70"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="1.79"/><rect class="b down" x="50.49" y="13.00" width="3.52" height="7.42"/><rect class="b down" x="55.99" y="13.00" width="3.52" height="0.70"/><rect class="b down" x="61.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.26" width="3.52" height="0.74"/><rect class="b up" x="72.49" y="9.31" width="3.52" height="3.69"/><rect class="b up" x="77.99" y="7.35" width="3.52" height="5.65"/><rect class="b up" x="83.49" y="9.72" width="3.52" height="3.28"/><rect class="b up" x="88.99" y="11.66" width="3.52" height="1.34"/><rect class="b up" x="94.49" y="11.29" width="3.52" height="1.71"/><rect class="b up" x="99.99" y="4.83" width="3.52" height="8.17"/><rect class="b up" x="105.49" y="11.69" width="3.52" height="1.31"/><rect class="b up" x="110.99" y="8.97" width="3.52" height="4.03"/><rect class="b up" x="116.49" y="1.00" width="3.52" height="12.00"/><rect class="b up" x="121.99" y="1.17" width="3.52" height="11.83"/><rect class="b up" x="127.49" y="5.00" width="3.52" height="8.00"/></svg></td>
+<td class="streak"><span class="sv">12</span><span class="meter" title="12 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">100.0</td>
+<td class="n dim">355.2</td>
+<td class="n down">-47.9</td>
+<td class="n">17</td>
+<td class="n dim">20.0</td>
+<td class="n up">+4.1</td>
+<td class="n dim">-13.4</td>
+<td class="ind">金融保險業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">5388</span>
+<span class="cname">中磊</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="11.78" width="3.52" height="1.22"/><rect class="b down" x="6.49" y="13.00" width="3.52" height="2.02"/><rect class="b down" x="11.99" y="13.00" width="3.52" height="2.05"/><rect class="b down" x="17.49" y="13.00" width="3.52" height="2.09"/><rect class="b down" x="22.99" y="13.00" width="3.52" height="1.53"/><rect class="b up" x="28.49" y="12.78" width="3.52" height="0.70"/><rect class="b down" x="33.99" y="13.00" width="3.52" height="2.14"/><rect class="b down" x="39.49" y="13.00" width="3.52" height="2.39"/><rect class="b down" x="44.99" y="13.00" width="3.52" height="2.62"/><rect class="b down" x="50.49" y="13.00" width="3.52" height="1.30"/><rect class="b down" x="55.99" y="13.00" width="3.52" height="0.89"/><rect class="b down" x="61.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="12.74" width="3.52" height="0.70"/><rect class="b up" x="72.49" y="11.60" width="3.52" height="1.40"/><rect class="b up" x="77.99" y="12.24" width="3.52" height="0.76"/><rect class="b up" x="83.49" y="11.01" width="3.52" height="1.99"/><rect class="b up" x="88.99" y="12.23" width="3.52" height="0.77"/><rect class="b up" x="94.49" y="11.62" width="3.52" height="1.38"/><rect class="b up" x="99.99" y="10.37" width="3.52" height="2.63"/><rect class="b up" x="105.49" y="11.31" width="3.52" height="1.69"/><rect class="b up" x="110.99" y="6.08" width="3.52" height="6.92"/><rect class="b up" x="116.49" y="7.76" width="3.52" height="5.24"/><rect class="b up" x="121.99" y="7.40" width="3.52" height="5.60"/><rect class="b up" x="127.49" y="7.34" width="3.52" height="5.66"/></svg></td>
+<td class="streak"><span class="sv">12</span><span class="meter" title="12 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">70.8</td>
+<td class="n dim">35.7</td>
+<td class="n up">+0.8</td>
+<td class="n">73</td>
+<td class="n dim">22.3</td>
+<td class="n up">+7.2</td>
+<td class="n dim">-11.7</td>
+<td class="ind">通信網路業</td>
+</tr>
+<tr>
+<th scope="row" class="name"><span class="code">3324</span>
+<span class="cname">雙鴻</span></th>
+<td class="sparkcell"><svg class="spark" viewBox="0 0 132 26" width="132" height="26" role="img" aria-label="近24個月營收年增率走勢" preserveAspectRatio="none"><line class="spark-zero" x1="0" y1="13.0" x2="132" y2="13.0"/><rect class="b up" x="0.99" y="10.79" width="3.52" height="2.21"/><rect class="b up" x="6.49" y="11.39" width="3.52" height="1.61"/><rect class="b up" x="11.99" y="11.78" width="3.52" height="1.22"/><rect class="b up" x="17.49" y="11.68" width="3.52" height="1.32"/><rect class="b up" x="22.99" y="11.34" width="3.52" height="1.66"/><rect class="b up" x="28.49" y="10.26" width="3.52" height="2.74"/><rect class="b up" x="33.99" y="12.40" width="3.52" height="0.70"/><rect class="b up" x="39.49" y="6.79" width="3.52" height="6.21"/><rect class="b up" x="44.99" y="8.78" width="3.52" height="4.22"/><rect class="b up" x="50.49" y="7.73" width="3.52" height="5.27"/><rect class="b up" x="55.99" y="11.58" width="3.52" height="1.42"/><rect class="b down" x="61.49" y="13.00" width="3.52" height="0.70"/><rect class="b up" x="66.99" y="10.84" width="3.52" height="2.16"/><rect class="b up" x="72.49" y="10.45" width="3.52" height="2.55"/><rect class="b up" x="77.99" y="7.85" width="3.52" height="5.15"/><rect class="b up" x="83.49" y="7.65" width="3.52" height="5.35"/><rect class="b up" x="88.99" y="6.74" width="3.52" height="6.26"/><rect class="b up" x="94.49" y="4.40" width="3.52" height="8.60"/><rect class="b up" x="99.99" y="3.27" width="3.52" height="9.73"/><rect class="b up" x="105.49" y="7.64" width="3.52" height="5.36"/><rect class="b up" x="110.99" y="5.66" width="3.52" height="7.34"/><rect class="b up" x="116.49" y="9.73" width="3.52" height="3.27"/><rect class="b up" x="121.99" y="5.50" width="3.52" height="7.50"/><rect class="b up" x="127.49" y="8.03" width="3.52" height="4.97"/></svg></td>
+<td class="streak"><span class="sv">12</span><span class="meter" title="12 個月"><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class="on"></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i><i class=""></i></span></td>
+<td class="n up">62.1</td>
+<td class="n dim">71.1</td>
+<td class="n down">-31.7</td>
+<td class="n">27</td>
+<td class="n dim">27.9</td>
+<td class="n up">+0.7</td>
+<td class="n dim">-16.2</td>
+<td class="ind">其他電子業</td>
+</tr>
+    </tbody>
+  </table></div>
+</section>
+
+<div class="two">
+  <section><h2>產業分布</h2><ul class="ind-list"><li><span class="il">電子零組件業</span><span class="ib"><i style="width:100%"></i></span><span class="ic">7</span></li><li><span class="il">半導體業</span><span class="ib"><i style="width:100%"></i></span><span class="ic">7</span></li><li><span class="il">電腦及週邊設備業</span><span class="ib"><i style="width:86%"></i></span><span class="ic">6</span></li><li><span class="il">其他電子業</span><span class="ib"><i style="width:71%"></i></span><span class="ic">5</span></li><li><span class="il">金融保險業</span><span class="ib"><i style="width:57%"></i></span><span class="ic">4</span></li><li><span class="il">鋼鐵工業</span><span class="ib"><i style="width:29%"></i></span><span class="ic">2</span></li><li><span class="il">化學工業</span><span class="ib"><i style="width:29%"></i></span><span class="ic">2</span></li><li><span class="il">電子通路業</span><span class="ib"><i style="width:14%"></i></span><span class="ic">1</span></li><li><span class="il">金融業</span><span class="ib"><i style="width:14%"></i></span><span class="ic">1</span></li><li><span class="il">通信網路業</span><span class="ib"><i style="width:14%"></i></span><span class="ic">1</span></li></ul></section>
+  <section><h2>怎麼讀這張表</h2><div class="note">
+    <p><strong>「連續」是主軸，不是 YoY。</strong>單月 YoY 掃描找到的是低基期反彈 —— 旺宏 +216%、至上 +231% 都沒能通過 12 個月連續篩選。這張表上的公司是連續一年以上每個月都在成長。</p>
+    <p><strong>「加速 pp」拆開同一群高成長股。</strong>本月 YoY 減上月 YoY。正值代表還在加速，負值代表成長正在鈍化 —— 同樣是兩位數成長，意義完全不同。</p>
+    <p><strong>季節性靠 YoY 抵銷。</strong>整個篩選只用年增率、完全不用月增率 —— 六月比去年六月，旺淡季自動相消。唯一 YoY 擋不住的是春節位移，已另行校正（見下）。實測命中個股全部兩年成長逾 20%，沒有「只是從坑裡爬回來」的個案。</p>
+    <p><strong>營收成長不等於獲利成長。</strong>電子通路業毛利率只有 3–5%，營收翻倍不代表獲利翻倍。這張表沒有毛利率，因為交易所的財報端點只涵蓋 82 家公司。</p>
+  </div></section>
+</div>
+
+<section>
+  <h2>已知陷阱</h2>
+  <dl class="traps">
+    <dt>建材營造被排除</dt>
+    <dd>建案在交屋當月一次認列營收，基期趨近於零。實測 1808 潤隆單月 YoY <strong>+162,537%</strong>、6901 鑽石投資 +4,397% —— 這是會計事件不是成長。同理排除「其他」「文創」「農科」。</dd>
+    <dt>YoY 上界 300%</dt>
+    <dd>超過的幾乎都是認列事件或極端低基期，留著只會把真正的成長股擠出畫面。</dd>
+    <dt>春節位移已校正</dt>
+    <dd>農曆春節在國曆的落點會漂移（民國 113 在 2 月、114 在 1 月、115 又回 2 月），有年假的月份工作天少一截 —— 這是 YoY <strong>修不掉</strong>的。實測全市場中位數：春節由 2月→1月 的年份，1月 YoY 比 2月低 <strong>17.2pp</strong>；1月→2月 則高 <strong>15.3pp</strong>；沒移動的年份僅差 2.4pp。民國 115 年 2 月因此是全年唯一負值，全市場 404 家只有該月為負。本掃描把每年 1、2 月<strong>合併為一期</strong>後才計算連續月數（台灣業界標準做法），否則 194 家的紀錄會被誤斷（健策 4→24、星宇航空 5→24）。</dd>
+    <dt>「加速 pp」未做春節校正</dt>
+    <dd>它是本月 YoY 直接減上月 YoY。目前最新月附近沒有年假，所以可用；但若最新月是 1 月或 2 月，這一欄不可信。</dd>
+    <dt>資料落後約兩個月</dt>
+    <dd>月營收於次月 10 日前公告，因此最新可用月份約落後兩個月。公告後重跑即更新。</dd>
+  </dl>
+</section>
+
+<footer>
+  <span>資料：公開資訊觀測站（MOPS）月營收 · 證交所 / 櫃買中心 openapi 價量估值 · yfinance 價格動能</span>
+  <span>產生於 2026-08-06</span>
+  <span><a href="./">每月營收 Treemap</a> · monthly-revenue.super168.work</span>
+</footer></div>
+</body>
+</html>
