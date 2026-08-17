@@ -8,3 +8,6 @@ site/manifest.json
 
 # 手動備份檔——git 歷史已經是備份，這些只會造成雜訊
 *.bak-*
+
+# VPS 備份設定（含主機位址，不進版控）
+deploy/sync-data-to-vps.conf

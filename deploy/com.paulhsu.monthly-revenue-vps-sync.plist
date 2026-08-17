@@ -1,0 +1,56 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  把 site/data/ 每天備份到 VPS。
+
+  安裝:
+      cp deploy/com.paulhsu.monthly-revenue-vps-sync.plist ~/Library/LaunchAgents/
+      launchctl bootstrap gui/$(id -u) ~/Library/LaunchAgents/com.paulhsu.monthly-revenue-vps-sync.plist
+  停用:
+      launchctl bootout gui/$(id -u)/com.paulhsu.monthly-revenue-vps-sync
+
+  排程設計:
+  資料由 com.paulhsu.monthly-revenue-update 在每月 11/12/13 日 10:40 產生
+  （月營收公布日）, 所以一個月只有三天真的會變。但這裡排每天 03:30 而不是
+  只排那三天 —— 理由是這台 Mac 睡得兇, 只排三天很容易整月錯過, 而沒變動的
+  日子 rsync 只比對不傳輸, 成本接近零。
+
+  03:30 是刻意挑的離峰時間: 不跟 08:00 的 FSC 抓取、08:30 之後的各種同步、
+  或 10:40 的月營收產生撞在一起。
+-->
+<plist version="1.0">
+<dict>
+    <key>Label</key>
+    <string>com.paulhsu.monthly-revenue-vps-sync</string>
+
+    <key>ProgramArguments</key>
+    <array>
+        <string>/bin/bash</string>
+        <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue/deploy/sync-data-to-vps.sh</string>
+    </array>
+
+    <key>StartCalendarInterval</key>
+    <dict>
+        <key>Hour</key><integer>3</integer>
+        <key>Minute</key><integer>30</integer>
+    </dict>
+
+    <key>StandardOutPath</key>
+    <string>/tmp/monthly_revenue_vps_sync.launchd.log</string>
+    <key>StandardErrorPath</key>
+    <string>/tmp/monthly_revenue_vps_sync.launchd.log</string>
+
+    <key>EnvironmentVariables</key>
+    <dict>
+        <key>PATH</key>
+        <string>/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin</string>
+    </dict>
+
+    <!-- 低優先權: 備份不該跟正在服務的網站搶 I/O -->
+    <key>ProcessType</key>
+    <string>Background</string>
+    <key>LowPriorityIO</key>
+    <true/>
+    <key>Nice</key>
+    <integer>10</integer>
+</dict>
+</plist>

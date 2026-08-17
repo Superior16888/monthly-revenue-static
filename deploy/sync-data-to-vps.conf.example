@@ -1,0 +1,7 @@
+# 複製成 deploy/sync-data-to-vps.conf 後填入。該檔已列入 .gitignore。
+#
+# 先確認免密碼登入可用：
+#   ssh -o BatchMode=yes admin@203.0.113.10 true && echo OK
+
+VPS_HOST=admin@203.0.113.10
+VPS_BACKUP_DIR=/home/admin/backup/monthly-revenue
