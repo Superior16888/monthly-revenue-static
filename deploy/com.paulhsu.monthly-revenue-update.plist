@@ -8,6 +8,7 @@
     <array>
         <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue/venv/bin/python</string>
         <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue/generate_static.py</string>
+        <string>--refresh-latest</string>
     </array>
     <key>WorkingDirectory</key>
     <string>/Users/paulhsu/Desktop/Blogger/monthly_revenue</string>

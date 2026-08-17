@@ -60,11 +60,12 @@ def new_session():
     return s
 
 
-def fetch_csv(s, year, month):
+def fetch_csv(s, year, month, market="sii"):
+    """market: 'sii' (上市) or 'otc' (上櫃)."""
     payload = {
         "step": "9",
         "functionName": "show_file2",
-        "filePath": "/t21/sii/",
+        "filePath": f"/t21/{market}/",
         "fileName": f"t21sc03_{year}_{month}.csv",
     }
     r = s.post("https://mopsov.twse.com.tw/server-java/FileDownLoad", data=payload, timeout=60)
@@ -180,11 +181,20 @@ def build_payload(df, prev_df=None):
 
 
 def rebuild_manifest():
-    months = sorted((p.stem for p in DATA.glob("*.json")),
-                    key=lambda k: (int(k.split("_")[0]), int(k.split("_")[1])))
+    def sort_key(k):
+        parts = k.split("_")
+        return (int(parts[0]), int(parts[1]))
+    months_sii = sorted(
+        (p.stem for p in DATA.glob("*.json") if not p.stem.endswith("_otc")),
+        key=sort_key)
+    months_otc = sorted(
+        (p.stem[:-4] for p in DATA.glob("*_otc.json")),
+        key=sort_key)
     manifest = {
-        "months": months,
-        "latest": months[-1] if months else None,
+        "months": months_sii,
+        "latest": months_sii[-1] if months_sii else None,
+        "months_otc": months_otc,
+        "latest_otc": months_otc[-1] if months_otc else None,
         "updated": datetime.datetime.now().isoformat(timespec="seconds"),
     }
     (SITE / "manifest.json").write_text(json.dumps(manifest, ensure_ascii=False))
@@ -196,24 +206,29 @@ def parse_ym(s):
     return int(y), int(m)
 
 
-def main():
-    ap = argparse.ArgumentParser()
-    ap.add_argument("--start", type=parse_ym, default=START, help="ROC y_m, e.g. 102_1")
-    ap.add_argument("--end", type=parse_ym, default=latest_published(), help="ROC y_m")
-    args = ap.parse_args()
-
-    DATA.mkdir(parents=True, exist_ok=True)
+def fetch_market(args, market):
+    """Fetch and store one market's data (sii or otc)."""
+    suffix = "" if market == "sii" else "_otc"
+    # 公司陸續申報到 10 日，11 日抓到的往往還缺件（曾經 115_6 只有 939 家、連台積電都沒有）。
+    # 既有月份預設跳過，但 --refresh-latest 會強制重抓最新一個月，讓 12/13 日的排程補齊。
+    refresh = set()
+    if args.refresh_latest:
+        months = list(month_range(args.start, args.end))
+        if months:
+            refresh.add(months[-1])
     targets = [(y, m) for y, m in month_range(args.start, args.end)
-               if not (DATA / f"{y}_{m}.json").exists()]
-    print(f"{len(targets)} months to fetch (through {args.end[0]}_{args.end[1]})", flush=True)
+               if (y, m) in refresh or not (DATA / f"{y}_{m}{suffix}.json").exists()]
+    label = "上市(SII)" if market == "sii" else "上櫃(OTC)"
+    print(f"{label}: {len(targets)} months to fetch", flush=True)
 
     session, fetched, failed = None, 0, []
-    raw = {}  # (y, m) -> raw df, so sequential backfill reuses prev month
+    raw = {}
 
     def get_raw(s, y, m):
-        if (y, m) not in raw:
-            raw[(y, m)] = fetch_csv(s, y, m)
-        return raw[(y, m)]
+        key = (market, y, m)
+        if key not in raw:
+            raw[key] = fetch_csv(s, y, m, market)
+        return raw[key]
 
     for y, m in targets:
         if session is None or fetched % 24 == 0:
@@ -221,24 +236,43 @@ def main():
         try:
             cur = get_raw(session, y, m)
             if prev_ym(y, m) < START:
-                prev = None  # MOPS has no data before 102_1; first month has no acc
+                prev = None
             else:
-                # prev fetch failure must FAIL the month (retried next pass) —
-                # silently writing acc=null once left 115_3 all-gray in acc view
                 prev = get_raw(session, *prev_ym(y, m))
             payload = build_payload(cur, prev)
-            (DATA / f"{y}_{m}.json").write_text(json.dumps(payload, ensure_ascii=False))
+            (DATA / f"{y}_{m}{suffix}.json").write_text(json.dumps(payload, ensure_ascii=False))
             fetched += 1
-            print(f"ok {y}_{m} ({payload['count']} companies)", flush=True)
+            print(f"ok {label} {y}_{m} ({payload['count']} companies)", flush=True)
         except Exception as e:
             failed.append(f"{y}_{m}")
-            print(f"FAIL {y}_{m}: {e}", flush=True)
+            print(f"FAIL {label} {y}_{m}: {e}", flush=True)
             session = None
         time.sleep(0.5)
+    return fetched, failed
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--start", type=parse_ym, default=START, help="ROC y_m, e.g. 102_1")
+    ap.add_argument("--end", type=parse_ym, default=latest_published(), help="ROC y_m")
+    ap.add_argument("--market", choices=["sii", "otc", "both"], default="both",
+                    help="上市(sii) / 上櫃(otc) / both (default)")
+    ap.add_argument("--refresh-latest", action="store_true",
+                    help="重抓範圍內最新一個月（補回 11 日尚未申報完的缺件公司）")
+    args = ap.parse_args()
+
+    DATA.mkdir(parents=True, exist_ok=True)
+    markets = ["sii", "otc"] if args.market == "both" else [args.market]
+    total_fetched, total_failed = 0, []
+    for market in markets:
+        f, fail = fetch_market(args, market)
+        total_fetched += f
+        total_failed += fail
 
     manifest = rebuild_manifest()
-    print(f"done: {fetched} fetched, {len(failed)} failed {failed if failed else ''}; latest={manifest['latest']}", flush=True)
-    return 1 if (failed and not fetched) else 0
+    print(f"done: {total_fetched} fetched, {len(total_failed)} failed {total_failed if total_failed else ''}; "
+          f"latest sii={manifest['latest']} otc={manifest.get('latest_otc')}", flush=True)
+    return 1 if (total_failed and not total_fetched) else 0
 
 
 if __name__ == "__main__":

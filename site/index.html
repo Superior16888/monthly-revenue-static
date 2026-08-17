@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>上市公司每月營收</title>
+<title>台股每月營收</title>
 <link rel="manifest" href="app.webmanifest">
 <meta name="theme-color" content="#1a6fc4">
 <link rel="icon" href="favicon-32.png" sizes="32x32">
@@ -23,6 +23,14 @@
   #chart { width: 100%; }
   #err { color: #b00020; padding: 20px; display: none; }
 
+  .market-toggle { display: flex; gap: 0; border: 1px solid #ccc; border-radius: 6px; overflow: hidden; }
+  .market-toggle button {
+    border: none; background: #f5f5f5; padding: 5px 16px; font-size: 15px;
+    cursor: pointer; transition: background 0.15s;
+  }
+  .market-toggle button.active { background: #1a6fc4; color: #fff; font-weight: bold; }
+  .market-toggle button:not(.active):hover { background: #e0e0e0; }
+
   .xlink { font-size: 15px; color: #1a6fc4; text-decoration: none;
            border: 1px solid #1a6fc4; border-radius: 6px; padding: 5px 12px; }
   .xlink:hover { background: #1a6fc4; color: #fff; }
@@ -30,8 +38,12 @@
 </head>
 <body>
 <header>
-  <h1>上市公司每月營收</h1>
+  <h1 id="title">台股每月營收</h1>
   <div class="controls">
+    <div class="market-toggle">
+      <button id="btn-sii" class="active" onclick="switchMarket('sii')">上市</button>
+      <button id="btn-otc" onclick="switchMarket('otc')">上櫃</button>
+    </div>
     <label>年度(民國)<select id="year"></select></label>
     <label>月份<select id="month"></select></label>
     <label>顏色指標<select id="metric">
@@ -47,16 +59,17 @@
 <div id="err"></div>
 <div id="chart"></div>
 <script>
-const $year = document.getElementById('year');
-const $month = document.getElementById('month');
-const $metric = document.getElementById('metric');
+const $year    = document.getElementById('year');
+const $month   = document.getElementById('month');
+const $metric  = document.getElementById('metric');
 const $caption = document.getElementById('caption');
-const $err = document.getElementById('err');
+const $err     = document.getElementById('err');
+const $title   = document.getElementById('title');
 let manifest = null;
-let payload = null;
+let payload  = null;
 let captionBase = '';
+let currentMarket = 'sii';
 
-// tick positions on the signed-power scale: t = (v/cap)^0.55
 const PCT_TICKS = {
   vals: [-1, -0.604, -0.282, 0, 0.282, 0.604, 1],
   text: ['≤−50%', '−20%', '−5%', '0', '+5%', '+20%', '≥+50%']
@@ -66,9 +79,9 @@ const ACC_TICKS = {
   text: ['≤−30pp', '−10pp', '−3pp', '0', '+3pp', '+10pp', '≥+30pp']
 };
 const METRICS = {
-  yoy: { label: '年增率', ticks: PCT_TICKS },
+  yoy: { label: '年增率',     ticks: PCT_TICKS },
   acc: { label: '年增率加速', ticks: ACC_TICKS },
-  mom: { label: '月增率', ticks: PCT_TICKS },
+  mom: { label: '月增率',     ticks: PCT_TICKS },
   cum: { label: '累計年增率', ticks: PCT_TICKS }
 };
 
@@ -86,7 +99,10 @@ function applyMetric() {
 $metric.addEventListener('change', applyMetric);
 
 const ym = k => k.split('_').map(Number);
-const monthsOf = y => manifest.months.filter(k => ym(k)[0] === y).map(k => ym(k)[1]);
+const monthsOf = (y, market) => {
+  const list = market === 'otc' ? manifest.months_otc : manifest.months;
+  return (list || []).filter(k => ym(k)[0] === y).map(k => ym(k)[1]);
+};
 
 function fillSelect(sel, values, selected) {
   sel.innerHTML = '';
@@ -98,10 +114,12 @@ function fillSelect(sel, values, selected) {
   }
 }
 
-async function load(y, m) {
+async function load(y, m, market) {
+  market = market || currentMarket;
   $caption.textContent = '載入中…';
+  const suffix = market === 'otc' ? '_otc' : '';
   try {
-    const r = await fetch(`data/${y}_${m}.json`);
+    const r = await fetch(`data/${y}_${m}${suffix}.json`);
     if (!r.ok) throw new Error(`HTTP ${r.status}`);
     payload = await r.json();
     const fig = payload.fig;
@@ -109,9 +127,11 @@ async function load(y, m) {
     fig.layout.autosize = true;
     fig.layout.height = Math.max(480, window.innerHeight - document.querySelector('header').offsetHeight - 20);
     await Plotly.newPlot('chart', fig.data, fig.layout, {responsive: true, displayModeBar: false});
-    captionBase = `民國 ${y} 年 ${m} 月 · 共 ${payload.count} 家公司 · 單位：億元`;
+    const marketLabel = market === 'otc' ? '上櫃' : '上市';
+    captionBase = `民國 ${y} 年 ${m} 月 ${marketLabel} · 共 ${payload.count} 家公司 · 單位：億元`;
     applyMetric();
-    history.replaceState(null, '', `#${y}_${m}`);
+    const hashMarket = market === 'otc' ? `otc_${y}_${m}` : `${y}_${m}`;
+    history.replaceState(null, '', `#${hashMarket}`);
     $err.style.display = 'none';
   } catch (e) {
     $err.textContent = `無法載入 ${y} 年 ${m} 月資料：${e.message}`;
@@ -124,7 +144,7 @@ function current() { return [Number($year.value), Number($month.value)]; }
 
 $year.addEventListener('change', () => {
   const y = Number($year.value);
-  const months = monthsOf(y);
+  const months = monthsOf(y, currentMarket);
   const keep = Number($month.value);
   const m = months.includes(keep) ? keep : months[months.length - 1];
   fillSelect($month, months, m);
@@ -132,19 +152,61 @@ $year.addEventListener('change', () => {
 });
 $month.addEventListener('change', () => load(...current()));
 
+function switchMarket(market) {
+  if (market === currentMarket) return;
+  currentMarket = market;
+  document.getElementById('btn-sii').classList.toggle('active', market === 'sii');
+  document.getElementById('btn-otc').classList.toggle('active', market === 'otc');
+  $title.textContent = market === 'otc' ? '上櫃公司每月營收' : '上市公司每月營收';
+
+  const list = market === 'otc' ? manifest.months_otc : manifest.months;
+  if (!list || list.length === 0) {
+    $err.textContent = `${market === 'otc' ? '上櫃' : '上市'}資料尚未產生，請先執行 generate_static.py --market ${market}`;
+    $err.style.display = 'block';
+    return;
+  }
+  $err.style.display = 'none';
+
+  const [curY, curM] = current();
+  const years = [...new Set(list.map(k => ym(k)[0]))].sort((a, b) => a - b);
+  const y = years.includes(curY) ? curY : years[years.length - 1];
+  const months = monthsOf(y, market);
+  const m = months.includes(curM) ? curM : months[months.length - 1];
+  fillSelect($year, years, y);
+  fillSelect($month, months, m);
+  load(y, m, market);
+}
+
 (async () => {
   try {
     const r = await fetch('manifest.json', {cache: 'no-cache'});
     manifest = await r.json();
-    let [y, m] = ym(manifest.latest);
-    if (location.hash.match(/^#\d+_\d+$/)) {
-      const [hy, hm] = ym(location.hash.slice(1));
-      if (manifest.months.includes(`${hy}_${hm}`)) { y = hy; m = hm; }
+
+    // Parse hash: #otc_115_5 or #115_5
+    let market = 'sii', y, m;
+    const hash = location.hash.slice(1);
+    const otcMatch = hash.match(/^otc_(\d+)_(\d+)$/);
+    const siiMatch = hash.match(/^(\d+)_(\d+)$/);
+    if (otcMatch) {
+      market = 'otc'; y = Number(otcMatch[1]); m = Number(otcMatch[2]);
+      const k = `${y}_${m}`;
+      if (!(manifest.months_otc || []).includes(k)) { y = null; }
+    } else if (siiMatch) {
+      y = Number(siiMatch[1]); m = Number(siiMatch[2]);
+      if (!manifest.months.includes(`${y}_${m}`)) { y = null; }
     }
-    const years = [...new Set(manifest.months.map(k => ym(k)[0]))].sort((a, b) => a - b);
+
+    currentMarket = market;
+    document.getElementById('btn-sii').classList.toggle('active', market === 'sii');
+    document.getElementById('btn-otc').classList.toggle('active', market === 'otc');
+    $title.textContent = market === 'otc' ? '上櫃公司每月營收' : '上市公司每月營收';
+
+    const list = market === 'otc' ? manifest.months_otc : manifest.months;
+    if (!y) { const [ly, lm] = ym((market === 'otc' ? manifest.latest_otc : manifest.latest) || list[list.length-1]); y = ly; m = lm; }
+    const years = [...new Set(list.map(k => ym(k)[0]))].sort((a, b) => a - b);
     fillSelect($year, years, y);
-    fillSelect($month, monthsOf(y), m);
-    load(y, m);
+    fillSelect($month, monthsOf(y, market), m);
+    load(y, m, market);
   } catch (e) {
     $err.textContent = `無法載入月份清單：${e.message}`;
     $err.style.display = 'block';

@@ -5,3 +5,6 @@ site/data/
 site/manifest.json
 *.log
 .DS_Store
+
+# 手動備份檔——git 歷史已經是備份，這些只會造成雜訊
+*.bak-*
